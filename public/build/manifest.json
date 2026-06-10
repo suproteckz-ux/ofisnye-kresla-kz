@@ -1,0 +1,20 @@
+{
+  "_alpine-DdaDH_LP.js": {
+    "file": "assets/alpine-DdaDH_LP.js",
+    "name": "alpine"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-DiOCHsA8.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-C-rzFyJz.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_alpine-DdaDH_LP.js"
+    ]
+  }
+}
