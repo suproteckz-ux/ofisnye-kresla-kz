@@ -66,35 +66,23 @@ Route::get('/robots.txt', function () {
         'User-agent: *',
         '',
         'Disallow: /admin',
-        'Disallow: /admin/',
         'Disallow: /lead',
         'Disallow: /health',
-        'Disallow: /livewire/',
-        'Disallow: /_ignition/',
+        'Disallow: /up',
+        'Disallow: /livewire',
+        'Disallow: /_ignition',
         'Disallow: /search',
-        'Disallow: /search?*',
-        'Disallow: /*?brand=*',
-        'Disallow: /*?price_min=*',
-        'Disallow: /*?price_max=*',
-        'Disallow: /*?in_stock=*',
-        'Disallow: /*?sort=*',
+        'Disallow: /*?*brand=*',
+        'Disallow: /*?*price_min=*',
+        'Disallow: /*?*price_max=*',
+        'Disallow: /*?*in_stock=*',
+        'Disallow: /*?*sort=*',
+        'Disallow: /*?*material=*',
+        'Disallow: /*?*type=*',
+        'Disallow: /*?*color=*',
+        'Disallow: /*?*mechanism=*',
+        'Disallow: /*?*load=*',
         '',
-        '# Разрешаем служебные',
-        'Allow: /catalog$',
-        'Allow: /brand/',
-        'Allow: /blog/',
-        'Allow: /sitemap',
-        '',
-        '# Чистые URL товаров и категорий разрешены по умолчанию',
-        '',
-        "Sitemap: {$appUrl}/sitemap.xml",
-        '',
-        'User-agent: Yandex',
-        'Crawl-delay: 1',
-        "Sitemap: {$appUrl}/sitemap.xml",
-        '',
-        'User-agent: Googlebot',
-        'Crawl-delay: 0',
         "Sitemap: {$appUrl}/sitemap.xml",
     ];
     return response(implode("\n", $lines), 200, [
@@ -106,6 +94,31 @@ Route::get('/robots.txt', function () {
 // ══════════════════════════════════════════════════════════════════
 // БЛОК 2: 301-редиректы старых URL
 // ══════════════════════════════════════════════════════════════════
+
+// /catalog/{parent}/{child}/{product} → canonical product URL
+Route::get('/catalog/{parent}/{child}/{product}', function (
+    string $parent,
+    string $child,
+    string $product
+) {
+    $productModel = \App\Models\Product::active()
+        ->where('slug', $product)
+        ->whereHas('category', function ($query) use ($parent, $child) {
+            $query->active()
+                ->where('slug', $child)
+                ->whereHas('parent', fn ($parentQuery) => $parentQuery
+                    ->active()
+                    ->where('slug', $parent));
+        })
+        ->with(['category', 'category.parent'])
+        ->firstOrFail();
+
+    return redirect($productModel->url, 301);
+})->where([
+    'parent'  => '[a-z0-9][a-z0-9\-]*',
+    'child'   => '[a-z0-9][a-z0-9\-]*',
+    'product' => '[a-z0-9][a-z0-9\-]*',
+]);
 
 // /catalog/{parent}/{child} → /{parent}/{child}
 Route::get('/catalog/{parent}/{child}', function (string $parent, string $child) {

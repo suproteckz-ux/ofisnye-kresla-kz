@@ -2,12 +2,12 @@
 
 @section('title', $brand->seoTitle())
 @section('description', $brand->seoDescription())
+@if($noindex)
+@section('noindex', true)
+@endif
 
 @section('canonical')
 <link rel="canonical" href="{{ $canonical }}">
-@if($noindex)
-<meta name="robots" content="noindex, nofollow">
-@endif
 @endsection
 
 @section('breadcrumbs')

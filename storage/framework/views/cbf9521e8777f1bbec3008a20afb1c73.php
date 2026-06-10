@@ -111,14 +111,24 @@ $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->
     
     <?php
     $allImages = [];
-    if ($product->main_image) {
-        $allImages[] = ['src' => asset('storage/'.$product->main_image), 'alt' => $product->main_image_alt ?: $product->name];
-    }
+    $seenImagePaths = [];
+    $appendImage = function ($path, $alt = null) use (&$allImages, &$seenImagePaths, $product) {
+        $normalizedPath = ltrim(trim((string) $path), '/');
+        if ($normalizedPath === '' || isset($seenImagePaths[$normalizedPath])) {
+            return;
+        }
+
+        $seenImagePaths[$normalizedPath] = true;
+        $allImages[] = [
+            'src' => asset('storage/'.$normalizedPath),
+            'alt' => $alt ?: $product->name,
+        ];
+    };
+
+    $appendImage($product->main_image, $product->main_image_alt);
     if (method_exists($product, 'images')) {
         foreach ($product->images as $img) {
-            if (!empty($img->path)) {
-                $allImages[] = ['src' => asset('storage/'.$img->path), 'alt' => $img->alt ?: $product->name];
-            }
+            $appendImage($img->path, $img->alt);
         }
     }
     $firstSrc = $allImages[0]['src'] ?? '';

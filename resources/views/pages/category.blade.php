@@ -8,10 +8,12 @@
 @extends('layouts.app')
 @section('title', $seoTitle)
 @section('description', $seoDesc)
+@if($noindex ?? false)
+@section('noindex', true)
+@endif
 
 @section('canonical')
 <link rel="canonical" href="{{ $canonical }}">
-@if($noindex ?? false)<meta name="robots" content="noindex, nofollow">@endif
 @if(($currentPage ?? 1) > 1 && $products->previousPageUrl())
     <link rel="prev" href="{{ $products->previousPageUrl() }}">
 @endif

@@ -5,7 +5,9 @@
     : 'Поиск по каталогу | ' . config('app.name')
 )
 {{-- Поисковые страницы не индексируются --}}
-@section('canonical')<meta name="robots" content="noindex, nofollow">@endsection
+@section('noindex', true)
+@section('canonical')
+@endsection
 
 @section('breadcrumbs')
 <a href="{{ route('home') }}">Главная</a>

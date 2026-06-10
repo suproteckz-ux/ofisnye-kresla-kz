@@ -1,10 +1,12 @@
 @extends('layouts.app')
 @section('title', 'Каталог офисных кресел в Алматы | ' . config('app.name'))
 @section('description', 'Каталог офисных кресел в Алматы: кресла для руководителей, эргономичные, компьютерные, игровые. Большой выбор, доставка по Казахстану.')
+@if($noindex ?? false)
+@section('noindex', true)
+@endif
 
 @section('canonical')
 <link rel="canonical" href="{{ $canonical ?? url('/catalog') }}">
-@if($noindex ?? false)<meta name="robots" content="noindex,nofollow">@endif
 @if(isset($products) && $products->currentPage() > 1 && $products->previousPageUrl())
     <link rel="prev" href="{{ $products->previousPageUrl() }}">
 @endif

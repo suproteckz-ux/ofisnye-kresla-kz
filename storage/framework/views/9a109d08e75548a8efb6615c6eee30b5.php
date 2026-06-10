@@ -32,7 +32,7 @@
 
             
             <form action="<?php echo e(route('search')); ?>" method="GET"
-                  style="flex:1;max-width:480px;min-width:0;display:none" id="desktop-search">
+                  style="flex:1;max-width:480px;min-width:80px;display:flex" id="header-search">
                 <input type="search" name="q" value="<?php echo e(request('q')); ?>"
                        placeholder="Поиск кресел..."
                        style="flex:1;min-width:0;padding:8px 14px;background:#f5f5f4;
@@ -132,31 +132,15 @@
                 Блог
             </a>
 
-            
-            <form action="<?php echo e(route('search')); ?>" method="GET"
-                  style="flex:1;min-width:80px;display:flex;margin-left:4px" id="mobile-search">
-                <input type="search" name="q" placeholder="Поиск..."
-                       style="flex:1;min-width:0;padding:6px 10px;background:#f5f5f4;
-                              border:1px solid #e7e5e4;border-radius:8px 0 0 8px;
-                              font-size:12px;color:#1c1917;outline:none">
-                <button type="submit"
-                        style="padding:6px 10px;background:#1c1917;border:none;
-                               border-radius:0 8px 8px 0;cursor:pointer;flex-shrink:0">
-                    <svg style="width:13px;height:13px;color:#fff" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </button>
-            </form>
         </nav>
     </div>
 </header>
 
 <style>
 /* Header responsive — заменяет Tailwind-классы */
-@media(min-width:768px){
-  #desktop-search{display:flex!important}
-  #mobile-search{display:none!important}
+@media(max-width:767px){
+  #header-search input{padding:6px 10px!important;font-size:12px!important}
+  #header-search button{padding:6px 10px!important}
 }
 @media(min-width:1024px){
   #header-phone{display:flex!important}
