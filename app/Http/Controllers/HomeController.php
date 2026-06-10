@@ -16,7 +16,7 @@ class HomeController extends Controller
         $hits = Cache::remember('home.hits', 1800, fn() =>
             Product::hits()
                 ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug'])
-                ->orderByDesc('views')->limit(8)->get()
+                ->orderByDesc('views')->limit(6)->get()
         );
 
         $newProducts = Cache::remember('home.new', 1800, fn() =>
@@ -26,7 +26,25 @@ class HomeController extends Controller
         );
 
         $categories = Cache::remember('home.categories', 3600, fn() =>
-            Category::active()->root()->ordered()->withCount('products')->limit(6)->get()
+            Category::active()
+                ->whereHas('parent', fn ($query) => $query
+                    ->active()
+                    ->where('slug', 'ofisnye-kresla'))
+                ->with([
+                    'parent:id,slug',
+                    'products' => fn ($query) => $query
+                        ->active()
+                        ->whereNotNull('main_image')
+                        ->orderByDesc('views')
+                        ->limit(1)
+                        ->select(['id', 'category_id', 'name', 'main_image', 'main_image_alt']),
+                ])
+                ->withCount([
+                    'products as active_products_count' => fn ($query) => $query->active(),
+                ])
+                ->ordered()
+                ->limit(6)
+                ->get()
         );
 
         $brands = Cache::remember('home.brands', 86400, fn() =>
@@ -41,12 +59,23 @@ class HomeController extends Controller
             Product::active()->count()
         );
 
-        // Hero: хит с фото
-        $heroProduct = $hits->first(fn($p) => !empty($p->main_image));
+        if ($hits->isEmpty()) {
+            $hits = Cache::remember('home.hits.fallback', 1800, fn() =>
+                Product::active()
+                    ->inStock()
+                    ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug'])
+                    ->whereNotNull('main_image')
+                    ->orderByDesc('views')
+                    ->limit(6)
+                    ->get()
+            );
+        }
+
+        $ogImage = asset('images/home-office-chair.webp');
 
         return view('pages.home', compact(
             'hits', 'newProducts', 'categories', 'brands',
-            'blogPosts', 'totalProducts', 'heroProduct'
+            'blogPosts', 'totalProducts', 'ogImage'
         ));
     }
 }

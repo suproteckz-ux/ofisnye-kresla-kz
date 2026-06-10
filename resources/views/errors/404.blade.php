@@ -3,8 +3,7 @@
 @php $appName = config('app.name'); @endphp
 @section('title', '404 — Страница не найдена | ' . $appName)
 @section('noindex', true)
-@section('canonical')
-@endsection
+@section('suppressCanonical', true)
 
 @section('content')
 <div class="container mx-auto px-4 py-20 text-center max-w-2xl">

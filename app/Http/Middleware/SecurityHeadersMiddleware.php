@@ -96,6 +96,7 @@ class SecurityHeadersMiddleware
         $directives = [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' "
+                . "https://unpkg.com "
                 . "https://www.googletagmanager.com "
                 . "https://www.google-analytics.com "
                 . "https://connect.facebook.net "

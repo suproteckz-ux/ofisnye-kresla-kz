@@ -1,7 +1,7 @@
 @php
     $phone         = \App\Services\CacheService::setting('phone', '');
     $whatsapp      = \App\Services\CacheService::setting('whatsapp', '');
-    $siteName      = config('app.name', 'Офисные кресла');
+    $siteName      = \App\Services\CacheService::setting('site_name', 'Офисные кресла Алматы');
     $navCategories = \Illuminate\Support\Facades\Cache::remember('nav.categories', 3600,
         fn() => \App\Models\Category::active()->root()->ordered()->with('children')->limit(6)->get()
     );
@@ -34,7 +34,8 @@
             <form action="{{ route('search') }}" method="GET"
                   style="flex:1;max-width:480px;min-width:80px;display:flex" id="header-search">
                 <input type="search" name="q" value="{{ request('q') }}"
-                       placeholder="Поиск кресел..."
+                       placeholder="Поиск кресел, брендов, артикулов..."
+                       aria-label="Поиск кресел, брендов и артикулов"
                        style="flex:1;min-width:0;padding:8px 14px;background:#f5f5f4;
                               border:1px solid #e7e5e4;border-radius:10px 0 0 10px;
                               font-size:13px;color:#1c1917;outline:none">
@@ -95,26 +96,32 @@
                             box-shadow:0 8px 24px rgba(0,0,0,0.10);z-index:100;
                             padding:8px;min-width:200px">
                     @foreach($navCategories as $cat)
-                    <a href="{{ $cat->url }}"
-                       style="display:block;padding:8px 12px;font-size:13px;color:#44403c;
-                              text-decoration:none;border-radius:8px;white-space:nowrap"
-                       onmouseover="this.style.background='#fffbeb';this.style.color='#d97706'"
-                       onmouseout="this.style.background='transparent';this.style.color='#44403c'">
-                        {{ $cat->name }}
-                    </a>
+                        <a href="{{ $cat->url }}"
+                           style="display:block;padding:8px 12px;font-size:13px;font-weight:600;color:#1c1917;
+                                  text-decoration:none;border-radius:8px;white-space:nowrap"
+                           onmouseover="this.style.background='#fffbeb';this.style.color='#d97706'"
+                           onmouseout="this.style.background='transparent';this.style.color='#1c1917'">
+                            {{ $cat->name }}
+                        </a>
+                        @foreach($cat->children->where('is_active', true) as $child)
+                        <a href="{{ url('/' . $cat->slug . '/' . $child->slug) }}"
+                           style="display:block;padding:7px 12px 7px 22px;font-size:12px;color:#78716c;
+                                  text-decoration:none;border-radius:8px;white-space:nowrap"
+                           onmouseover="this.style.background='#fffbeb';this.style.color='#d97706'"
+                           onmouseout="this.style.background='transparent';this.style.color='#78716c'">
+                            {{ $child->name }}
+                        </a>
+                        @endforeach
                     @endforeach
                 </div>
             </div>
 
-            {{-- Категории — только на desktop --}}
-            @foreach($navCategories->take(3) as $cat)
-            <a href="{{ $cat->url }}"
-               style="display:none;padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0" class="nav-cat-desktop"
+            <a href="{{ url('/ofisnye-kresla') }}"
+               style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
                onmouseover="this.style.background='#f5f5f4';this.style.color='#1c1917'"
                onmouseout="this.style.background='transparent';this.style.color='#78716c'">
-                {{ $cat->name }}
+                Офисные кресла
             </a>
-            @endforeach
 
             <a href="{{ route('brands') }}"
                style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
@@ -127,6 +134,24 @@
                       white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
                onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
                 Блог
+            </a>
+            <a href="{{ url('/#sales') }}"
+               style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
+                      white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
+               onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
+                Акции
+            </a>
+            <a href="{{ url('/#delivery-payment') }}"
+               style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
+                      white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
+               onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
+                Доставка и оплата
+            </a>
+            <a href="{{ url('/#contacts') }}"
+               style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
+                      white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
+               onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
+                Контакты
             </a>
 
         </nav>
@@ -141,7 +166,6 @@
 }
 @media(min-width:1024px){
   #header-phone{display:flex!important}
-  .nav-cat-desktop{display:block!important}
 }
 @media(min-width:480px){
   #wa-text{display:inline!important}

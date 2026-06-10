@@ -40,14 +40,15 @@ $waMsg = urlencode('Хочу заказать: ' . ($product->name ?? '') . ' �
             <img src="{{ asset('storage/'.$product->main_image) }}"
                  alt="{{ $product->main_image_alt ?? $product->name }}"
                  loading="lazy"
-                 onerror="this.parentElement.style.display='none';this.parentElement.parentElement.querySelector('.img-placeholder').style.display='flex'"
+                 onerror="this.onerror=null;this.src='{{ asset('img/no-photo.svg') }}';this.style.padding='28px'"
                  style="width:100%;height:100%;object-fit:contain;padding:12px;position:absolute;top:0;left:0">
         </picture>
         @endif
-        <div class="img-placeholder" style="{{ !empty($product->main_image) ? 'display:none' : 'display:flex' }};width:100%;height:100%;align-items:center;justify-content:center;background:#f5f5f4">
-            <svg style="width:56px;height:56px;color:#d6d3d1" fill="currentColor" viewBox="0 0 100 100">
-                <path d="M50 15C35 15 25 25 25 40v20c0 5 3 9 7 10l-2 10h10l2-10h16l2 10h10l-2-10c4-1 7-5 7-10V40c0-15-10-25-25-25z" opacity="0.5"/>
-            </svg>
+        <div class="img-placeholder" style="{{ !empty($product->main_image) ? 'display:none' : 'display:flex' }};width:100%;height:100%;align-items:center;justify-content:center;background:#fafaf9">
+            <img src="{{ asset('img/no-photo.svg') }}"
+                 alt="Изображение товара временно отсутствует"
+                 loading="lazy"
+                 style="width:72px;height:72px;object-fit:contain">
         </div>
 
         {{-- Бейджи --}}

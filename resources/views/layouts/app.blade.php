@@ -11,7 +11,12 @@
 @endphp
 <title>{{ $pageTitle }}</title>
 @if($pageDesc)<meta name="description" content="{{ $pageDesc }}">@endif
-@hasSection('canonical')@yield('canonical')@else<link rel="canonical" href="{{ url()->current() }}">@endif
+@hasSection('suppressCanonical')
+@elseif(View::hasSection('canonical'))
+@yield('canonical')
+@else
+<link rel="canonical" href="{{ url()->current() }}">
+@endif
 @hasSection('noindex')
 <meta name="robots" content="noindex,follow">
 @else

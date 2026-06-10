@@ -6,8 +6,7 @@
 )
 {{-- Поисковые страницы не индексируются --}}
 @section('noindex', true)
-@section('canonical')
-@endsection
+@section('suppressCanonical', true)
 
 @section('breadcrumbs')
 <a href="{{ route('home') }}">Главная</a>
