@@ -25,7 +25,9 @@ class HomeController extends Controller
                 ->latest()->limit(8)->get()
         );
 
-        $categories = Cache::remember('home.categories', 3600, fn() =>
+        // Versioned key prevents the old cached root-category collection from
+        // surviving after the homepage switched to child categories.
+        $categories = Cache::remember('home.categories.v2', 3600, fn() =>
             Category::active()
                 ->whereHas('parent', fn ($query) => $query
                     ->active()

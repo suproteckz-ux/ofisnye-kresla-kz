@@ -23,7 +23,7 @@ $wa    = \App\Services\CacheService::setting('whatsapp', '');
 $waMsg = urlencode('Хочу заказать: ' . ($product->name ?? '') . ' — ' . config('app.name'));
 @endphp
 
-<div style="background:#fff;border-radius:16px;border:1px solid #e7e5e4;overflow:hidden;
+<div class="product-card" style="background:#fff;border-radius:16px;border:1px solid #e7e5e4;overflow:hidden;
             display:flex;flex-direction:column;height:100%;
             transition:border-color 0.2s,box-shadow 0.2s"
      onmouseover="this.style.borderColor='#fde68a';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)'"
@@ -75,20 +75,20 @@ $waMsg = urlencode('Хочу заказать: ' . ($product->name ?? '') . ' �
         </div>
     </a>
 
-    <div style="padding:14px;display:flex;flex-direction:column;flex:1">
+    <div class="product-card-body" style="padding:14px;display:flex;flex-direction:column;flex:1">
         @if(!empty($product->brand))
-        <p style="font-size:11px;color:#d97706;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        <p class="product-card-brand" style="font-size:11px;color:#d97706;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
             {{ $product->brand->name }}
         </p>
         @endif
 
-        <a href="{{ $product->url }}"
+        <a href="{{ $product->url }}" class="product-card-title"
            style="font-size:13px;font-weight:600;color:#1c1917;line-height:1.4;margin-bottom:10px;flex:1;
                   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-decoration:none">
             {{ $product->name }}
         </a>
 
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+        <div class="product-card-price" style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
             <span style="font-size:17px;font-weight:800;color:#1c1917">
                 {{ number_format($product->price, 0, '.', ' ') }} ₸
             </span>
@@ -100,14 +100,14 @@ $waMsg = urlencode('Хочу заказать: ' . ($product->name ?? '') . ' �
         </div>
 
         @if($wa)
-        <a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener"
+        <a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener" class="product-card-button"
            style="display:block;width:100%;padding:9px;background:#22c55e;color:#fff;font-size:12px;font-weight:700;
                   text-align:center;border-radius:10px;text-decoration:none;transition:background 0.2s"
            onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
             Купить в WhatsApp
         </a>
         @else
-        <a href="{{ $product->url }}"
+        <a href="{{ $product->url }}" class="product-card-button"
            style="display:block;width:100%;padding:9px;background:#1c1917;color:#fff;font-size:12px;font-weight:700;
                   text-align:center;border-radius:10px;text-decoration:none">
             Подробнее →

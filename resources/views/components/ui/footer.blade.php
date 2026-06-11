@@ -87,6 +87,11 @@
 
 <style>
 .footer-cols{display:grid;grid-template-columns:1fr;gap:28px}
+@media(max-width:639px){
+  footer>div{padding:28px 18px 17px!important}
+  .footer-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;margin-bottom:24px!important}
+  .footer-cols>div:first-child,.footer-cols>div:last-child{grid-column:1/-1}
+}
 @media(min-width:640px){.footer-cols{grid-template-columns:repeat(2,1fr);gap:32px}}
 @media(min-width:1024px){.footer-cols{grid-template-columns:2fr 1fr 1fr 1.5fr;gap:40px}}
 </style>
