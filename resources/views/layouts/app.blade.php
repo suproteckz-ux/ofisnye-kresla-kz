@@ -37,9 +37,10 @@
 <style>
 /* ── Reset ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{max-width:100%;overflow-x:hidden}
+html{max-width:100%;min-height:100%;overflow-x:hidden}
 img,picture{max-width:100%;height:auto;display:block}
-body{font-family:'Inter',system-ui,sans-serif;color:#111;background:#fff;line-height:1.5}
+body{max-width:100%;min-height:100svh;min-height:100dvh;overflow-x:hidden;display:flex;flex-direction:column;font-family:'Inter',system-ui,sans-serif;color:#111;background:#fff;line-height:1.5}
+main{flex:1 0 auto;min-width:0}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 [x-cloak]{display:none!important}

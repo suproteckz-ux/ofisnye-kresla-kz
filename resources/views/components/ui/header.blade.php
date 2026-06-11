@@ -9,7 +9,8 @@
 
 <header class="site-header bg-white border-b border-stone-100 sticky top-0 z-50 shadow-sm"
         x-data="{ mobileMenu: false, mobileSearch: false, catalogOpen: false }"
-        @keydown.escape.window="mobileMenu=false;mobileSearch=false;catalogOpen=false">
+        @pageshow.window="mobileMenu=false;mobileSearch=false;catalogOpen=false;if($refs.catalogDropdown)$refs.catalogDropdown.style.display='none'"
+        @keydown.escape.window="mobileMenu=false;mobileSearch=false;catalogOpen=false;if($refs.catalogDropdown)$refs.catalogDropdown.style.display='none'">
     <div class="container mx-auto px-4" style="position:relative">
 
         {{-- ── Верхняя строка ─────────────────────────────── --}}
@@ -102,8 +103,9 @@
             {{-- Каталог + мегаменю --}}
             <div class="catalog-menu" style="position:relative;flex-shrink:0"
                  @mouseenter="if (window.innerWidth >= 768) catalogOpen=true"
-                 @mouseleave="catalogOpen=false"
-                 @click.outside="catalogOpen=false">
+                 @mouseleave="catalogOpen=false;if($refs.catalogDropdown)$refs.catalogDropdown.style.display='none'"
+                 @focusout="if(!$el.contains($event.relatedTarget)){catalogOpen=false;if($refs.catalogDropdown)$refs.catalogDropdown.style.display='none'}"
+                 @click.outside="catalogOpen=false;if($refs.catalogDropdown)$refs.catalogDropdown.style.display='none'">
                 <a href="{{ route('catalog') }}"
                    :aria-expanded="catalogOpen ? 'true' : 'false'"
                    aria-haspopup="true"
@@ -118,15 +120,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </a>
-                <div class="catalog-dropdown" x-show="catalogOpen" x-cloak
-                     x-transition:enter="catalog-dropdown-enter"
-                     x-transition:enter-start="catalog-dropdown-enter-start"
-                     x-transition:enter-end="catalog-dropdown-enter-end"
-                     x-transition:leave="catalog-dropdown-leave"
-                     x-transition:leave-start="catalog-dropdown-enter-end"
-                     x-transition:leave-end="catalog-dropdown-enter-start"
-                     @click="if ($event.target.closest('a')) catalogOpen=false"
-                     style="position:absolute;top:calc(100% + 4px);left:0;
+                <div class="catalog-dropdown" x-ref="catalogDropdown" x-cloak
+                     :style="{ display: catalogOpen ? 'block' : 'none' }"
+                     @click="if($event.target.closest('a')){catalogOpen=false;$refs.catalogDropdown.style.display='none'}"
+                     style="display:none;position:absolute;top:calc(100% + 4px);left:0;
                             background:#fff;border:1px solid #e7e5e4;border-radius:12px;
                             box-shadow:0 12px 30px rgba(28,25,23,0.13);z-index:100;
                             padding:7px;min-width:250px;width:250px">
@@ -196,10 +193,6 @@
 <style>
 /* Header responsive — заменяет Tailwind-классы */
 .header-mobile-phone,.header-menu-button{display:none}
-.catalog-dropdown-enter{transition:opacity .14s ease,transform .14s ease}
-.catalog-dropdown-leave{transition:opacity .1s ease,transform .1s ease}
-.catalog-dropdown-enter-start{opacity:0;transform:translateY(-4px)}
-.catalog-dropdown-enter-end{opacity:1;transform:translateY(0)}
 @media(max-width:767px){
   .site-header .container{padding-left:14px!important;padding-right:14px!important}
   .header-row{height:58px!important;gap:8px!important}
