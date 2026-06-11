@@ -8,8 +8,8 @@
 @endphp
 
 <header class="site-header bg-white border-b border-stone-100 sticky top-0 z-50 shadow-sm"
-        x-data="{ mobileMenu: false, mobileSearch: false }"
-        @keydown.escape.window="mobileMenu=false;mobileSearch=false">
+        x-data="{ mobileMenu: false, mobileSearch: false, catalogOpen: false }"
+        @keydown.escape.window="mobileMenu=false;mobileSearch=false;catalogOpen=false">
     <div class="container mx-auto px-4" style="position:relative">
 
         {{-- ── Верхняя строка ─────────────────────────────── --}}
@@ -84,7 +84,7 @@
                 <button type="button" class="header-menu-button"
                         aria-label="Открыть меню"
                         :aria-expanded="mobileMenu ? 'true' : 'false'"
-                        @click="mobileMenu=!mobileMenu;mobileSearch=false">
+                        @click="mobileMenu=!mobileMenu;mobileSearch=false;catalogOpen=false">
                     <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                         <path x-show="!mobileMenu" d="M4 6h16M4 12h16M4 18h16"/>
                         <path x-show="mobileMenu" x-cloak d="M6 6l12 12M18 6L6 18"/>
@@ -96,16 +96,18 @@
         {{-- ── Навигация ───────────────────────────────────── --}}
         <nav class="header-nav"
              style="display:flex;align-items:center;gap:3px;padding-bottom:5px"
-             x-data="{ megaOpen: false }"
-             x-show="mobileMenu"
-             x-cloak
-             x-transition.opacity
+             :data-mobile-open="mobileMenu ? 'true' : 'false'"
              @click="if (window.innerWidth < 768 && $event.target.closest('a')) mobileMenu=false">
 
             {{-- Каталог + мегаменю --}}
-            <div style="position:relative;flex-shrink:0"
-                 @mouseenter="megaOpen=true" @mouseleave="megaOpen=false">
+            <div class="catalog-menu" style="position:relative;flex-shrink:0"
+                 @mouseenter="if (window.innerWidth >= 768) catalogOpen=true"
+                 @mouseleave="catalogOpen=false"
+                 @click.outside="catalogOpen=false">
                 <a href="{{ route('catalog') }}"
+                   :aria-expanded="catalogOpen ? 'true' : 'false'"
+                   aria-haspopup="true"
+                   @focus="if (window.innerWidth >= 768) catalogOpen=true"
                    style="display:flex;align-items:center;gap:4px;padding:6px 12px;
                           font-size:13px;font-weight:500;color:#44403c;
                           white-space:nowrap;text-decoration:none;border-radius:8px"
@@ -116,14 +118,21 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </a>
-                <div x-show="megaOpen" x-cloak
+                <div class="catalog-dropdown" x-show="catalogOpen" x-cloak
+                     x-transition:enter="catalog-dropdown-enter"
+                     x-transition:enter-start="catalog-dropdown-enter-start"
+                     x-transition:enter-end="catalog-dropdown-enter-end"
+                     x-transition:leave="catalog-dropdown-leave"
+                     x-transition:leave-start="catalog-dropdown-enter-end"
+                     x-transition:leave-end="catalog-dropdown-enter-start"
+                     @click="if ($event.target.closest('a')) catalogOpen=false"
                      style="position:absolute;top:calc(100% + 4px);left:0;
                             background:#fff;border:1px solid #e7e5e4;border-radius:12px;
-                            box-shadow:0 8px 24px rgba(0,0,0,0.10);z-index:100;
-                            padding:8px;min-width:200px">
+                            box-shadow:0 12px 30px rgba(28,25,23,0.13);z-index:100;
+                            padding:7px;min-width:250px;width:250px">
                     @foreach($navCategories as $cat)
                         <a href="{{ $cat->url }}"
-                           style="display:block;padding:8px 12px;font-size:13px;font-weight:600;color:#1c1917;
+                           style="display:block;padding:8px 11px;font-size:13px;font-weight:600;color:#1c1917;
                                   text-decoration:none;border-radius:8px;white-space:nowrap"
                            onmouseover="this.style.background='#fffbeb';this.style.color='#d97706'"
                            onmouseout="this.style.background='transparent';this.style.color='#1c1917'">
@@ -131,7 +140,7 @@
                         </a>
                         @foreach($cat->children->where('is_active', true) as $child)
                         <a href="{{ url('/' . $cat->slug . '/' . $child->slug) }}"
-                           style="display:block;padding:7px 12px 7px 22px;font-size:12px;color:#78716c;
+                           style="display:block;padding:7px 11px 7px 18px;font-size:12px;color:#78716c;
                                   text-decoration:none;border-radius:8px;white-space:nowrap"
                            onmouseover="this.style.background='#fffbeb';this.style.color='#d97706'"
                            onmouseout="this.style.background='transparent';this.style.color='#78716c'">
@@ -187,6 +196,10 @@
 <style>
 /* Header responsive — заменяет Tailwind-классы */
 .header-mobile-phone,.header-menu-button{display:none}
+.catalog-dropdown-enter{transition:opacity .14s ease,transform .14s ease}
+.catalog-dropdown-leave{transition:opacity .1s ease,transform .1s ease}
+.catalog-dropdown-enter-start{opacity:0;transform:translateY(-4px)}
+.catalog-dropdown-enter-end{opacity:1;transform:translateY(0)}
 @media(max-width:767px){
   .site-header .container{padding-left:14px!important;padding-right:14px!important}
   .header-row{height:58px!important;gap:8px!important}
@@ -205,13 +218,14 @@
   #header-search[data-open="true"] input{display:block;border-radius:9px 0 0 9px!important;background:#fff!important}
   #header-search[data-open="true"] button{border-radius:0 9px 9px 0!important;background:#1c1917!important}
   #header-search[data-open="true"] button svg{color:#fff!important}
-  .header-nav{position:absolute;left:14px;right:14px;top:58px;z-index:110;flex-direction:column;align-items:stretch!important;gap:2px!important;padding:8px!important;background:#fff;border:1px solid #e7e5e4;border-radius:12px;box-shadow:0 12px 30px rgba(28,25,23,.13)}
+  .header-nav{position:absolute;left:14px;right:14px;top:58px;z-index:110;display:none!important;flex-direction:column;align-items:stretch!important;gap:2px!important;padding:8px!important;background:#fff;border:1px solid #e7e5e4;border-radius:12px;box-shadow:0 12px 30px rgba(28,25,23,.13)}
+  .header-nav[data-mobile-open="true"]{display:flex!important}
   .header-nav>a,.header-nav>div>a{display:flex!important;width:100%;padding:10px 12px!important}
   .header-nav>div{width:100%}
   .header-nav>div>div{display:none!important}
 }
 @media(min-width:768px){
-  .header-nav{display:flex!important}
+  .header-nav{display:flex}
 }
 @media(min-width:1024px){
   #header-phone{display:flex!important}
