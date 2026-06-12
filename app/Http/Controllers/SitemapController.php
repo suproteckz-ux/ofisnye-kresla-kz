@@ -192,6 +192,15 @@ class SitemapController extends Controller
                 priority:   '0.8'
             );
 
+            foreach (['/akcii', '/delivery-payment', '/contacts'] as $staticPage) {
+                $items .= $this->urlEntry(
+                    loc:        url($staticPage),
+                    lastmod:    $lastProduct,
+                    changefreq: 'monthly',
+                    priority:   '0.6'
+                );
+            }
+
             SeoPage::active()
                 ->select(['id', 'slug', 'updated_at'])
                 ->each(function (SeoPage $page) use (&$items) {

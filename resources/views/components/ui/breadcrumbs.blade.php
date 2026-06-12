@@ -1,18 +1,23 @@
 @props(['items' => []])
 @if(count($items))
-<nav aria-label="Хлебные крошки">
-    <ol class="flex items-center gap-1 text-sm text-gray-500 flex-wrap">
-        <li><a href="{{ route('home') }}" class="hover:text-amber-500">Главная</a></li>
+<nav class="site-breadcrumbs" aria-label="Хлебные крошки">
+    <ol>
+        <li><a href="{{ route('home') }}">Главная</a></li>
         @foreach($items as $item)
-        <li class="flex items-center gap-1">
-            <span class="text-gray-300">/</span>
+        <li>
+            <span class="bc-divider">/</span>
             @if(isset($item['url']))
-                <a href="{{ $item['url'] }}" class="hover:text-amber-500">{{ $item['name'] }}</a>
+                <a href="{{ $item['url'] }}">{{ $item['name'] }}</a>
             @else
-                <span class="text-gray-700 font-medium">{{ $item['name'] }}</span>
+                <span class="bc-current">{{ $item['name'] }}</span>
             @endif
         </li>
         @endforeach
     </ol>
 </nav>
+<style>
+.site-breadcrumbs ol{display:flex;align-items:center;gap:6px;flex-wrap:wrap;list-style:none;margin:0;padding:0;font-size:13px;color:#888}
+.site-breadcrumbs li{display:flex;align-items:center;gap:6px}.site-breadcrumbs a{color:#888}.site-breadcrumbs a:hover{color:#d97706}
+.site-breadcrumbs .bc-divider{color:#d6d3d1}.site-breadcrumbs .bc-current{color:#57534e;font-weight:500}
+</style>
 @endif

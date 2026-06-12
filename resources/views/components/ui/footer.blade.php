@@ -48,14 +48,14 @@
             {{-- Колонка 3: Покупателям --}}
             <div>
                 <div style="color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Покупателям</div>
-                <span style="display:block;font-size:13px;color:#777;margin-bottom:8px">Доставка</span>
-                <span style="display:block;font-size:13px;color:#777;margin-bottom:8px">Оплата</span>
-                <span style="display:block;font-size:13px;color:#777">Гарантия</span>
+                <a href="{{ route('delivery-payment') }}#delivery" style="display:block;font-size:13px;color:#777;margin-bottom:8px">Доставка</a>
+                <a href="{{ route('delivery-payment') }}#payment" style="display:block;font-size:13px;color:#777;margin-bottom:8px">Оплата</a>
+                <a href="{{ route('delivery-payment') }}#warranty" style="display:block;font-size:13px;color:#777">Гарантия</a>
             </div>
 
             {{-- Колонка 4: Контакты --}}
             <div>
-                <div style="color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Контакты</div>
+                <a href="{{ route('contacts') }}" style="display:block;color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Контакты</a>
                 @if($address)
                 <p style="font-size:13px;color:#777;margin-bottom:8px">{{ $address }}</p>
                 @endif

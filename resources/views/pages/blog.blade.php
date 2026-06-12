@@ -5,13 +5,11 @@
 
 @section('canonical')
 <link rel="canonical" href="{{ $canonical }}">
-
-{{-- rel prev/next для серии страниц пагинации --}}
 @if(($currentPage ?? 1) > 1 && $posts->previousPageUrl())
-    <link rel="prev" href="{{ $posts->previousPageUrl() }}">
+<link rel="prev" href="{{ $posts->previousPageUrl() }}">
 @endif
 @if($posts->hasMorePages())
-    <link rel="next" href="{{ $posts->nextPageUrl() }}">
+<link rel="next" href="{{ $posts->nextPageUrl() }}">
 @endif
 @endsection
 
@@ -20,76 +18,101 @@
 @endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<section class="blog-page">
+    <div class="container">
+        <div class="blog-intro">
+            <h1>Статьи об офисных креслах</h1>
+            <p>Советы по выбору офисных кресел, обзоры моделей, брендов и эргономики рабочего места.</p>
+        </div>
 
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-        Статьи об офисных креслах
-    </h1>
-    <p class="text-gray-500 text-sm mb-8">
-        Советы по выбору офисных кресел, обзоры брендов и эргономика рабочего места
-    </p>
+        @if($posts->count())
+        <div class="blog-grid">
+            @foreach($posts as $post)
+            <article class="blog-card">
+                @if($post->cover_image)
+                <a href="{{ $post->url }}" class="blog-card-image">
+                    <picture>
+                        @if($post->cover_image_webp)
+                        <source srcset="{{ asset('storage/' . $post->cover_image_webp) }}" type="image/webp">
+                        @endif
+                        <img src="{{ asset('storage/' . $post->cover_image) }}"
+                             alt="{{ $post->cover_image_alt ?? $post->title }}"
+                             loading="lazy" width="640" height="360">
+                    </picture>
+                </a>
+                @endif
 
-    @if($posts->count())
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach($posts as $post)
-        <article class="bg-white border border-gray-100 rounded-2xl overflow-hidden
-                        hover:shadow-md transition-shadow duration-200 flex flex-col">
+                <div class="blog-card-body">
+                    @if($post->published_at)
+                    <time datetime="{{ $post->published_at->format('Y-m-d') }}">
+                        {{ $post->published_at->translatedFormat('d F Y') }}
+                    </time>
+                    @endif
+                    <h2><a href="{{ $post->url }}">{{ $post->title }}</a></h2>
+                    <a href="{{ $post->url }}" class="blog-read-more">
+                        Читать статью <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+            </article>
+            @endforeach
+        </div>
 
-            {{-- Обложка --}}
-            @if($post->cover_image)
-            <a href="{{ $post->url }}" class="block aspect-video overflow-hidden bg-gray-100 flex-shrink-0">
-                <img src="{{ asset('storage/' . ($post->cover_image_webp ?? $post->cover_image)) }}"
-                     alt="{{ $post->cover_image_alt ?? $post->title }}"
-                     loading="lazy"
-                     width="400"
-                     height="225"
-                     class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-            </a>
+        @if($posts->hasPages())
+        <nav class="blog-pagination" aria-label="Пагинация статей">
+            @if($posts->onFirstPage())
+            <span class="is-disabled">← Назад</span>
+            @else
+            <a href="{{ $posts->previousPageUrl() }}" rel="prev">← Назад</a>
             @endif
 
-            <div class="p-5 flex flex-col flex-grow">
-                <time class="text-xs text-gray-400 mb-2 block"
-                      datetime="{{ $post->published_at?->format('Y-m-d') }}">
-                    {{ $post->published_at?->translatedFormat('d F Y') }}
-                </time>
+            <span class="blog-page-number">
+                Страница {{ $posts->currentPage() }} из {{ $posts->lastPage() }}
+            </span>
 
-                <h2 class="font-bold text-gray-900 mb-3 leading-snug flex-grow">
-                    <a href="{{ $post->url }}"
-                       class="hover:text-primary-600 transition-colors">
-                        {{ $post->title }}
-                    </a>
-                </h2>
-
-                <a href="{{ $post->url }}"
-                   class="inline-flex items-center gap-1 text-sm text-primary-600
-                          font-medium hover:underline mt-auto">
-                    Читать статью
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
-            </div>
-        </article>
-        @endforeach
+            @if($posts->hasMorePages())
+            <a href="{{ $posts->nextPageUrl() }}" rel="next">Вперёд →</a>
+            @else
+            <span class="is-disabled">Вперёд →</span>
+            @endif
+        </nav>
+        @endif
+        @else
+        <div class="blog-empty">
+            <h2>Статей пока нет</h2>
+            <p>Скоро здесь появятся полезные материалы об офисных креслах.</p>
+        </div>
+        @endif
     </div>
+</section>
 
-    {{-- Пагинация --}}
-    @if($posts->hasPages())
-    <div class="mt-10">
-        {{ $posts->links() }}
-    </div>
-    @endif
-
-    @else
-    <div class="text-center py-16 text-gray-400">
-        <div class="text-5xl mb-4">📝</div>
-        <p class="text-lg font-medium text-gray-600">Статей пока нет</p>
-        <p class="text-sm mt-2">Скоро здесь появятся полезные материалы</p>
-    </div>
-    @endif
-
-</div>
+<style>
+.blog-page{padding:28px 0 56px}
+.blog-intro{max-width:760px;margin-bottom:28px}
+.blog-intro h1{font-size:clamp(1.75rem,4vw,2.4rem);font-weight:800;line-height:1.15;margin-bottom:10px}
+.blog-intro p{font-size:15px;color:#666;line-height:1.65}
+.blog-grid{display:grid;grid-template-columns:1fr;gap:18px}
+.blog-card{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid #e7e5e4;border-radius:16px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.blog-card:hover{border-color:#fed7aa;box-shadow:0 10px 30px rgba(0,0,0,.07)}
+.blog-card-image{display:block;aspect-ratio:16/9;background:#f5f5f4;overflow:hidden}
+.blog-card-image picture,.blog-card-image img{display:block;width:100%;height:100%}
+.blog-card-image img{object-fit:cover;transition:transform .25s}
+.blog-card:hover .blog-card-image img{transform:scale(1.025)}
+.blog-card-body{display:flex;flex-direction:column;flex:1;padding:18px}
+.blog-card time{display:block;font-size:12px;color:#a8a29e;margin-bottom:8px}
+.blog-card h2{font-size:17px;line-height:1.4;font-weight:700;margin-bottom:18px}
+.blog-card h2 a:hover{color:#d97706}
+.blog-read-more{display:inline-flex;align-items:center;gap:6px;margin-top:auto;color:#d97706;font-size:13px;font-weight:700}
+.blog-read-more span{font-size:16px;line-height:1}
+.blog-pagination{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:32px}
+.blog-pagination a,.blog-pagination>span{padding:9px 13px;border:1px solid #e7e5e4;border-radius:9px;font-size:13px;background:#fff}
+.blog-pagination a:hover{border-color:#ff8a00;color:#d97706}
+.blog-pagination .blog-page-number{border-color:transparent;background:#f5f5f4}
+.blog-pagination .is-disabled{color:#bbb}
+.blog-empty{padding:52px 20px;text-align:center;background:#fafaf9;border-radius:16px}
+.blog-empty h2{font-size:20px;margin-bottom:6px}.blog-empty p{color:#777}
+@media(min-width:640px){.blog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1024px){.blog-page{padding-top:36px}.blog-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}}
+</style>
 @endsection
 
 @section('schema')

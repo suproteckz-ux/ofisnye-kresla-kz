@@ -167,19 +167,19 @@
                onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
                 Блог
             </a>
-            <a href="{{ url('/#sales') }}"
+            <a href="{{ route('promotions') }}"
                style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
                       white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
                onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
                 Акции
             </a>
-            <a href="{{ url('/#delivery-payment') }}"
+            <a href="{{ route('delivery-payment') }}"
                style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
                       white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
                onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">
                 Доставка и оплата
             </a>
-            <a href="{{ url('/#contacts') }}"
+            <a href="{{ route('contacts') }}"
                style="padding:6px 10px;font-size:13px;font-weight:500;color:#78716c;
                       white-space:nowrap;text-decoration:none;border-radius:8px;flex-shrink:0"
                onmouseover="this.style.background='#f5f5f4'" onmouseout="this.style.background='transparent'">

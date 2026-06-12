@@ -4,6 +4,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InformationPageController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
@@ -39,6 +40,10 @@ Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{post}', [BlogController::class, 'show'])
     ->name('blog.show')
     ->where('post', '[a-z0-9][a-z0-9\-]*');
+
+Route::get('/akcii', [InformationPageController::class, 'promotions'])->name('promotions');
+Route::get('/delivery-payment', [InformationPageController::class, 'deliveryPayment'])->name('delivery-payment');
+Route::get('/contacts', [InformationPageController::class, 'contacts'])->name('contacts');
 
 // Health check
 Route::get('/health', function () {
