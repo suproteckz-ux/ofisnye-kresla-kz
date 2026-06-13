@@ -90,6 +90,13 @@ class Product extends Model
     {
         $cat = $this->relationLoaded('category') ? $this->category : null;
 
+        if (! $cat || ! array_key_exists('parent_id', $cat->getAttributes())) {
+            $cat = $this->category()->with('parent:id,slug')->first();
+            $this->setRelation('category', $cat);
+        } elseif ($cat->parent_id && ! $cat->relationLoaded('parent')) {
+            $cat->load('parent:id,slug');
+        }
+
         if (! $cat) {
             // Fallback без категории — не попадает в sitemap
             return url('/product/' . $this->slug);

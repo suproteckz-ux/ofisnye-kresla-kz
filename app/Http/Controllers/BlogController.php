@@ -37,7 +37,11 @@ class BlogController extends Controller
             ->where('slug', $slug)
             ->with([
                 'products' => fn($q) => $q->active()
-                    ->with('brand:id,name,slug')
+                    ->with([
+                        'brand:id,name,slug',
+                        'category:id,name,slug,parent_id',
+                        'category.parent:id,slug',
+                    ])
                     ->select('products.id', 'products.name', 'products.slug',
                              'products.price', 'products.old_price', 'products.main_image',
                              'products.main_image_webp', 'products.main_image_alt',

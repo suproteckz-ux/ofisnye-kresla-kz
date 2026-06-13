@@ -132,7 +132,14 @@ class CatalogController extends Controller
         // 2. Fallback: SEO-страница из БД
         $page = SeoPage::active()
             ->where('slug', $slug)
-            ->with(['products' => fn($q) => $q->active()->with('brand'), 'categories'])
+            ->with([
+                'products' => fn($q) => $q->active()->with([
+                    'brand',
+                    'category:id,name,slug,parent_id',
+                    'category.parent:id,slug',
+                ]),
+                'categories',
+            ])
             ->first();
 
         if ($page) {

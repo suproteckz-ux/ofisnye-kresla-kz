@@ -4,7 +4,11 @@
 // Это важно: у массива/обычного object нет методов hasDiscount(), brand и других связей.
 if (is_array($product)) {
     $product = \App\Models\Product::query()
-        ->with(['brand'])
+        ->with([
+            'brand',
+            'category:id,name,slug,parent_id',
+            'category.parent:id,slug',
+        ])
         ->when(!empty($product['id'] ?? null), fn($q) => $q->where('id', $product['id']))
         ->when(empty($product['id'] ?? null) && !empty($product['slug'] ?? null), fn($q) => $q->where('slug', $product['slug']))
         ->first();

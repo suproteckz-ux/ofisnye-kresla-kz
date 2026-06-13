@@ -17,7 +17,11 @@ class SeoPageController extends Controller
         $page = SeoPage::active()
             ->where('slug', $slug)
             ->with([
-                'products' => fn ($q) => $q->active()->with('brand'),
+                'products' => fn ($q) => $q->active()->with([
+                    'brand',
+                    'category:id,name,slug,parent_id',
+                    'category.parent:id,slug',
+                ]),
                 'categories',
             ])
             ->first(); // first() → null, не исключение
@@ -61,7 +65,11 @@ class SeoPageController extends Controller
         $products = Product::active()
             ->where('category_id', $filter->category_id)
             ->where('brand_id',    $filter->brand_id)
-            ->with(['brand:id,name,slug', 'category:id,name,slug'])
+            ->with([
+                'brand:id,name,slug',
+                'category:id,name,slug,parent_id',
+                'category.parent:id,slug',
+            ])
             ->orderByDesc('is_hit')
             ->paginate(24);
 

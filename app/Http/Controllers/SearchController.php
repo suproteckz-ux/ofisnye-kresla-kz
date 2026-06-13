@@ -28,7 +28,7 @@ class SearchController extends Controller
     private function search(string $query): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         return Product::active()
-            ->with(['brand:id,name,slug', 'category:id,name,slug', 'category.parent:id,slug'])
+            ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug'])
             ->select([
                 'id', 'name', 'slug', 'sku', 'price', 'old_price',
                 'main_image', 'main_image_webp', 'main_image_alt',

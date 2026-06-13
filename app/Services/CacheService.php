@@ -79,7 +79,7 @@ class CacheService
             self::KEY_HOMEPAGE_HITS,
             self::TTL_HOMEPAGE,
             fn () => \App\Models\Product::hits()
-                ->with(['brand:id,name,slug', 'category:id,name,slug'])
+                ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug'])
                 ->orderBy('sort_order')
                 ->limit(8)
                 ->get([
@@ -96,7 +96,7 @@ class CacheService
             self::KEY_HOMEPAGE_NEW,
             self::TTL_HOMEPAGE,
             fn () => \App\Models\Product::new()
-                ->with(['brand:id,name,slug', 'category:id,name,slug'])
+                ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug'])
                 ->latest()
                 ->limit(8)
                 ->get([
