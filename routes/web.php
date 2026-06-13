@@ -98,7 +98,7 @@ Route::get('/robots.txt', function () {
     ];
     return response(implode("\n", $lines), 200, [
         'Content-Type'  => 'text/plain; charset=UTF-8',
-        'Cache-Control' => 'public, max-age=86400',
+        'Cache-Control' => 'no-cache, max-age=0, must-revalidate',
     ]);
 });
 
@@ -160,11 +160,11 @@ Route::get('/p112599607-ofisnoe-kreslo-podgolovnikom.html', [LegacyProductRedire
 Route::get('/{category}/{legacyProduct}', [LegacyProductRedirectController::class, 'nested'])
     ->where([
         'category'      => '[a-z0-9][a-z0-9\-]*',
-        'legacyProduct' => '[^/]*[\x{0400}-\x{04FF}][^/]*',
+        'legacyProduct' => '[A-Za-z0-9\-]*[0-9][^/]*\-.*',
     ]);
 
 Route::get('/{legacyProduct}', [LegacyProductRedirectController::class, 'root'])
-    ->where('legacyProduct', '[^/]*[\x{0400}-\x{04FF}][^/]*');
+    ->where('legacyProduct', '[A-Za-z0-9\-]*[0-9][^/]*\-.*');
 // ══════════════════════════════════════════════════════════════════
 // БЛОК 3: Чистые URL товаров — /{parent}/{child}/{product}
 // ВАЖНО: ставим раньше /{parent}/{child}, т.к. три сегмента конкретнее
