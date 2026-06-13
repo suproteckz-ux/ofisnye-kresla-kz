@@ -6,6 +6,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InformationPageController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LegacyProductRedirectController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SeoPageController;
@@ -76,12 +77,17 @@ Route::get('/robots.txt', function () {
         'Disallow: /up',
         'Disallow: /livewire',
         'Disallow: /_ignition',
+        'Disallow: /login',
+        'Disallow: /image/cache/',
         'Disallow: /search',
         'Disallow: /*?*brand=*',
         'Disallow: /*?*price_min=*',
         'Disallow: /*?*price_max=*',
         'Disallow: /*?*in_stock=*',
         'Disallow: /*?*sort=*',
+        'Disallow: /*?*order=*',
+        'Disallow: /*?*limit=*',
+        'Disallow: /*?*tag=*',
         'Disallow: /*?*material=*',
         'Disallow: /*?*type=*',
         'Disallow: /*?*color=*',
@@ -148,6 +154,17 @@ Route::get('/product/{slug}', function (string $slug) {
 
     return redirect($product->url, 301);
 })->name('product.show')->where('slug', '[a-z0-9][a-z0-9\-]*');
+
+Route::get('/p112599607-ofisnoe-kreslo-podgolovnikom.html', [LegacyProductRedirectController::class, 'prom']);
+
+Route::get('/{category}/{legacyProduct}', [LegacyProductRedirectController::class, 'nested'])
+    ->where([
+        'category'      => '[a-z0-9][a-z0-9\-]*',
+        'legacyProduct' => '[^/]*[\x{0400}-\x{04FF}][^/]*',
+    ]);
+
+Route::get('/{legacyProduct}', [LegacyProductRedirectController::class, 'root'])
+    ->where('legacyProduct', '[^/]*[\x{0400}-\x{04FF}][^/]*');
 // ══════════════════════════════════════════════════════════════════
 // БЛОК 3: Чистые URL товаров — /{parent}/{child}/{product}
 // ВАЖНО: ставим раньше /{parent}/{child}, т.к. три сегмента конкретнее

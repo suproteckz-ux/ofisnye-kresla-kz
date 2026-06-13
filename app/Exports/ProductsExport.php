@@ -47,7 +47,11 @@ class ProductsExport
      */
     private function buildRows(): Collection
     {
-        $query = Product::with(['brand:id,name', 'category:id,name'])
+        $query = Product::with([
+            'brand:id,name',
+            'category:id,name,slug,parent_id',
+            'category.parent:id,slug',
+        ])
             ->orderBy('category_id')
             ->orderBy('name');
 
@@ -67,7 +71,7 @@ class ProductsExport
                 'Старая цена (тг)'=> $p->old_price ?? '',
                 'Остаток'         => $p->quantity,
                 'В наличии'       => $p->in_stock ? 'Да' : 'Нет',
-                'URL'             => url("/product/{$p->slug}"),
+                'URL'             => $p->url,
             ]);
     }
 }

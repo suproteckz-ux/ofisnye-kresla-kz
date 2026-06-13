@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(prepend: [
             \App\Http\Middleware\RemoveTrailingSlash::class,
+            \App\Http\Middleware\NormalizeLegacyQueryParameters::class,
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\HandleRedirects::class,

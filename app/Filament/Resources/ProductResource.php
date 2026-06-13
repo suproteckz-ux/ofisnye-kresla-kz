@@ -325,7 +325,11 @@ class ProductResource extends Resource
                     ->icon('heroicon-o-arrow-top-right-on-square')
                     ->tooltip('Открыть на сайте')
                     ->color('gray')
-                    ->url(fn (Product $r): string => url('/product/' . $r->slug))
+                    ->url(function (Product $r): string {
+                        $r->loadMissing(['category.parent']);
+
+                        return $r->url;
+                    })
                     ->openUrlInNewTab(),
 
                 DeleteAction::make()
