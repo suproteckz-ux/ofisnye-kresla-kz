@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class LegacyProductRedirectController extends Controller
@@ -23,11 +24,45 @@ class LegacyProductRedirectController extends Controller
         return redirect(url('/ofisnye-kresla/s-podgolovnikom'), 301);
     }
 
+    public function fallback(Request $request): RedirectResponse
+    {
+        $path = trim(rawurldecode($request->getPathInfo()), '/');
+        $segments = array_values(array_filter(explode('/', $path), fn (string $segment) => $segment !== ''));
+
+        if (count($segments) < 1 || count($segments) > 2) {
+            abort(404);
+        }
+
+        $legacySlug = end($segments);
+        if (! is_string($legacySlug) || ! preg_match('/^[a-z0-9-]*\d[a-z0-9-]*-/i', $legacySlug)) {
+            abort(404);
+        }
+
+        return $this->redirectByLegacySlug($legacySlug);
+    }
+
     private function redirectByLegacySlug(string $legacySlug): RedirectResponse
     {
         $normalizedSlug = $this->normalizeSku($legacySlug);
+        $legacySku = $this->extractLegacySku($legacySlug);
 
-        $skuIndex = Cache::remember('legacy_product_sku_index', 3600, function (): array {
+        if ($legacySku !== null) {
+            $product = Product::active()
+                ->where(function ($query) use ($legacySku) {
+                    $query->where('sku', $legacySku)
+                        ->orWhere('slug', 'like', "{$legacySku}-%")
+                        ->orWhere('slug', 'like', "%-{$legacySku}-%")
+                        ->orWhere('slug', 'like', "%-{$legacySku}");
+                })
+                ->with(['category', 'category.parent'])
+                ->first();
+
+            if ($product && $product->category) {
+                return redirect($product->url, 301);
+            }
+        }
+
+        $skuIndex = Cache::remember('legacy_product_sku_index_v2', 3600, function (): array {
             return Product::active()
                 ->whereNotNull('sku')
                 ->pluck('id', 'sku')
@@ -59,6 +94,17 @@ class LegacyProductRedirectController extends Controller
         }
 
         return redirect($product->url, 301);
+    }
+
+    private function extractLegacySku(string $legacySlug): ?string
+    {
+        $legacySlug = strtolower(rawurldecode($legacySlug));
+
+        if (preg_match('/^([a-z0-9-]*\d[a-z0-9-]*?)-(?=[^\x00-\x7F])/u', $legacySlug, $matches)) {
+            return trim($matches[1], '-');
+        }
+
+        return null;
     }
 
     private function normalizeSku(string $value): string

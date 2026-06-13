@@ -196,3 +196,5 @@ Route::get('/{parent}/{child}', [CatalogController::class, 'twoSegment'])
 Route::get('/{slug}', [CatalogController::class, 'oneSegment'])
     ->name('catalog.category')
     ->where('slug', '[a-z0-9][a-z0-9\-]*');
+
+Route::fallback([LegacyProductRedirectController::class, 'fallback']);

@@ -1,0 +1,26 @@
+User-agent: *
+
+Disallow: /admin
+Disallow: /lead
+Disallow: /health
+Disallow: /up
+Disallow: /livewire
+Disallow: /_ignition
+Disallow: /login
+Disallow: /image/cache/
+Disallow: /search
+Disallow: /*?*brand=*
+Disallow: /*?*price_min=*
+Disallow: /*?*price_max=*
+Disallow: /*?*in_stock=*
+Disallow: /*?*sort=*
+Disallow: /*?*order=*
+Disallow: /*?*limit=*
+Disallow: /*?*tag=*
+Disallow: /*?*material=*
+Disallow: /*?*type=*
+Disallow: /*?*color=*
+Disallow: /*?*mechanism=*
+Disallow: /*?*load=*
+
+Sitemap: https://xn----8sbnbmoilhzgg4a5h.kz/sitemap.xml
