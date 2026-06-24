@@ -243,7 +243,7 @@
 .seo-hero__content p{font-size:16px;line-height:1.7;color:#57534e;margin:0 0 22px;max-width:640px}
 .seo-hero__actions{display:flex;flex-wrap:wrap;gap:10px}
 .seo-hero__image{height:330px;border-radius:18px;background:#fafaf9;overflow:hidden}
-.seo-hero__image img{width:100%;height:100%;object-fit:contain;padding:18px}
+.seo-hero__image img{width:100%;height:100%;object-fit:cover}
 .seo-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 18px;border-radius:12px;font-size:14px;font-weight:800;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s}
 .seo-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(17,17,17,.1)}
 .seo-btn--orange{background:#ff8a00;color:#fff}
