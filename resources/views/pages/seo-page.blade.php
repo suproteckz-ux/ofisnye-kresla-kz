@@ -151,15 +151,25 @@
             @foreach($categories as $category)
             @php
                 $fallbackProduct = $landingProducts->first(fn ($product) => (int) ($product->category_id ?? 0) === (int) $category->id && !empty($product->main_image));
-                $categoryImage = $category->image ?: ($fallbackProduct->main_image ?? null);
+                if (!$fallbackProduct && empty($category->image)) {
+                    $fallbackProduct = \App\Models\Product::active()
+                        ->where('category_id', $category->id)
+                        ->whereNotNull('main_image')
+                        ->where('main_image', '!=', '')
+                        ->orderByDesc('is_hit')
+                        ->orderBy('sort_order')
+                        ->first();
+                }
+                $categoryImage = $category->image ?: ($fallbackProduct->main_image ?? 'img/no-photo.svg');
+                $categoryImageSrc = str_starts_with($categoryImage, 'img/')
+                    ? asset($categoryImage)
+                    : asset('storage/' . $categoryImage);
                 $categoryDescription = strip_tags($category->meta_description ?: $category->seo_text_top ?: 'Подборка моделей для офиса и дома.');
             @endphp
             <article class="seo-category-card">
-                @if(!empty($categoryImage))
                 <a class="seo-category-card__image" href="{{ $category->url }}" aria-label="{{ $category->name }}">
-                    <img src="{{ asset('storage/' . $categoryImage) }}" alt="{{ $category->name }}" loading="lazy">
+                    <img src="{{ $categoryImageSrc }}" alt="{{ $category->name }}" loading="lazy">
                 </a>
-                @endif
                 <div class="seo-category-card__body">
                     <h3>{{ $category->name }}</h3>
                     <p>{{ $categoryDescription }}</p>
@@ -248,15 +258,15 @@
 .seo-section{margin-top:36px}
 .seo-section__head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}
 .seo-section__head h2,.seo-faq h2,.seo-cta h2{font-size:24px;line-height:1.25;font-weight:850;color:#111;margin:0}
-.seo-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.seo-category-card{display:flex;flex-direction:column;min-height:100%;border:1px solid #eee;border-radius:18px;background:#fff;overflow:hidden;color:#111;text-decoration:none;box-shadow:0 8px 24px rgba(17,17,17,.04);transition:border-color .2s,box-shadow .2s,transform .2s}
+.seo-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
+.seo-category-card{display:flex;flex-direction:column;height:100%;border:1px solid #eee;border-radius:18px;background:#fff;padding:18px;color:#111;text-decoration:none;box-shadow:0 8px 24px rgba(17,17,17,.04);transition:border-color .2s,box-shadow .2s,transform .2s}
 .seo-category-card:hover{border-color:#ff8a00;box-shadow:0 16px 34px rgba(17,17,17,.1);transform:translateY(-2px)}
-.seo-category-card__image{display:block;height:165px;background:#fff;overflow:hidden}
-.seo-category-card__image img{width:100%;height:100%;object-fit:contain;padding:12px}
-.seo-category-card__body{display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex:1;min-width:0;padding:18px 20px 20px}
-.seo-category-card h3{font-size:19px;line-height:1.3;font-weight:700;margin:0;color:#111}
-.seo-category-card p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:44px;margin:0;color:#666;font-size:14px;line-height:1.55}
-.seo-category-card__button{display:inline-flex;align-items:center;justify-content:center;margin-top:auto;min-height:42px;padding:10px 20px;border-radius:10px;background:#ff8a00;color:#fff;font-size:14px;font-weight:800;text-decoration:none;transition:background .2s,box-shadow .2s}
+.seo-category-card__image{display:block;width:100%;height:180px;margin-bottom:16px;border-radius:12px;background:#fff;overflow:hidden}
+.seo-category-card__image img{display:block;width:100%;height:180px;object-fit:cover;border-radius:12px}
+.seo-category-card__body{display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:0}
+.seo-category-card h3{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:50px;font-size:19px;line-height:1.3;font-weight:700;margin:0 0 8px;color:#111}
+.seo-category-card p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:66px;margin:0 0 18px;color:#666;font-size:14px;line-height:1.55}
+.seo-category-card__button{display:flex;align-items:center;justify-content:center;width:100%;height:42px;margin-top:auto;padding:0 20px;border-radius:10px;background:#ff8a00;color:#fff;font-size:14px;font-weight:800;text-decoration:none;transition:background .2s,box-shadow .2s}
 .seo-category-card__button:hover{background:#ea7a00;color:#fff;box-shadow:0 10px 18px rgba(255,138,0,.24)}
 .seo-products-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .seo-text{max-width:900px;margin-top:42px;color:#444;font-size:16px;line-height:1.78}
@@ -286,8 +296,8 @@
     .seo-btn{width:100%}
     .seo-benefits{grid-template-columns:1fr;gap:10px;margin-bottom:28px}
     .seo-category-grid{grid-template-columns:1fr;gap:12px}
-    .seo-category-card__image{height:155px}
-    .seo-category-card__body{padding:17px 18px 18px}
+    .seo-category-card__image{height:180px;margin-bottom:14px}
+    .seo-category-card__image img{height:180px}
     .seo-category-card h3{font-size:18px}
     .seo-products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .seo-section__head h2,.seo-faq h2,.seo-cta h2,.seo-text h2{font-size:21px}
