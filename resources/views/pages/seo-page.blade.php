@@ -10,6 +10,7 @@
         ? collect($rawLandingProducts->items())
         : collect($rawLandingProducts);
     $seoText = isset($page) ? $page->seo_text : ($filter->seo_text ?? null);
+    $cleanSeoText = $seoText ? preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $seoText) : null;
     $faqItems = isset($page) ? collect($page->faq_array ?? [])->filter(fn ($faq) => !empty($faq['question'] ?? null) && !empty($faq['answer'] ?? null))->values() : collect();
     $heroPath = $heroImage ?? null;
     $heroSubtitle = isset($page) ? ($page->hero_subtitle ?: ($page->meta_description ?: $seoDescription)) : $seoDescription;
@@ -22,6 +23,7 @@
     $whatsappMessage = urlencode('Здравствуйте! Хочу подобрать офисное кресло со страницы ' . $seoH1);
     $whatsappUrl = $whatsappPhone ? "https://wa.me/{$whatsappPhone}?text={$whatsappMessage}" : null;
     $finalCtaUrl = $ctaButtonUrl ?: $whatsappUrl;
+    $showCta = isset($page) && (!empty($page->cta_title) || !empty($page->cta_text));
     $primaryButtonText = isset($page) ? ($page->hero_button_text ?: 'Смотреть товары') : 'Смотреть товары';
     $primaryButtonUrl = isset($page) && $page->hero_button_url
         ? $page->hero_button_url
@@ -150,24 +152,48 @@
         <div class="seo-category-grid">
             @foreach($categories as $category)
             @php
-                $fallbackProduct = $landingProducts->first(fn ($product) => (int) ($product->category_id ?? 0) === (int) $category->id && !empty($product->main_image));
-                if (!$fallbackProduct && empty($category->image)) {
-                    $fallbackProduct = \App\Models\Product::active()
-                        ->where('category_id', $category->id)
-                        ->whereNotNull('main_image')
-                        ->where('main_image', '!=', '')
-                        ->orderByDesc('is_hit')
-                        ->orderBy('sort_order')
-                        ->first();
+                $categoryImage = $category->image;
+                $categoryImageKind = $categoryImage ? 'category' : 'product';
+                $fallbackProduct = null;
+
+                if (!$categoryImage) {
+                    $fallbackProduct = $landingProducts->first(fn ($product) => (int) ($product->category_id ?? 0) === (int) $category->id && !empty($product->main_image));
+
+                    if (!$fallbackProduct && $category->relationLoaded('products')) {
+                        $fallbackProduct = $category->products->first(fn ($product) => !empty($product->main_image));
+                    }
+
+                    if (!$fallbackProduct && $category->relationLoaded('children')) {
+                        $fallbackProduct = $category->children
+                            ->flatMap(fn ($child) => $child->relationLoaded('products') ? $child->products : collect())
+                            ->first(fn ($product) => !empty($product->main_image));
+                    }
+
+                    if (!$fallbackProduct) {
+                        $childIds = $category->relationLoaded('children')
+                            ? $category->children->pluck('id')->all()
+                            : \App\Models\Category::active()->where('parent_id', $category->id)->pluck('id')->all();
+
+                        $fallbackProduct = \App\Models\Product::active()
+                            ->whereIn('category_id', array_merge([$category->id], $childIds))
+                            ->whereNotNull('main_image')
+                            ->where('main_image', '!=', '')
+                            ->orderByDesc('is_hit')
+                            ->orderBy('sort_order')
+                            ->first();
+                    }
+
+                    $categoryImage = $fallbackProduct->main_image ?? 'img/no-photo.svg';
+                    $categoryImageKind = $fallbackProduct ? 'product' : 'placeholder';
                 }
-                $categoryImage = $category->image ?: ($fallbackProduct->main_image ?? 'img/no-photo.svg');
+
                 $categoryImageSrc = str_starts_with($categoryImage, 'img/')
                     ? asset($categoryImage)
                     : asset('storage/' . $categoryImage);
-                $categoryDescription = strip_tags($category->meta_description ?: $category->seo_text_top ?: 'Подборка моделей для офиса и дома.');
+                $categoryDescription = strip_tags($category->meta_description ?: $category->seo_text_top ?: 'Подборка моделей для офиса, дома и рабочих мест.');
             @endphp
             <article class="seo-category-card">
-                <a class="seo-category-card__image" href="{{ $category->url }}" aria-label="{{ $category->name }}">
+                <a class="seo-category-card__image seo-category-card__image--{{ $categoryImageKind }}" href="{{ $category->url }}" aria-label="{{ $category->name }}">
                     <img src="{{ $categoryImageSrc }}" alt="{{ $category->name }}" loading="lazy">
                 </a>
                 <div class="seo-category-card__body">
@@ -194,13 +220,13 @@
     </section>
     @endif
 
-    @if(!empty($seoText))
+    @if(!empty($cleanSeoText))
     <section class="seo-text" id="seo-text">
-        {!! $seoText !!}
+        {!! $cleanSeoText !!}
     </section>
     @endif
 
-    @if($finalCtaUrl)
+    @if($showCta && $finalCtaUrl)
     <section class="seo-cta">
         <div>
             <h2>{{ $ctaTitle }}</h2>
@@ -236,13 +262,13 @@
 
 <style>
 .seo-landing{max-width:1180px;margin:0 auto;padding:18px 16px 56px;color:#111}
-.seo-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:28px;align-items:center;margin:4px 0 22px;padding:28px;border:1px solid #eee;border-radius:18px;background:#fff;box-shadow:0 16px 42px rgba(17,17,17,.06)}
+.seo-hero{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;margin:4px 0 22px;padding:28px;border:1px solid #eee;border-radius:22px;background:#fff;box-shadow:0 16px 42px rgba(17,17,17,.06)}
 .seo-hero--text-only{grid-template-columns:1fr}
 .seo-hero--text-only .seo-hero__content{max-width:760px}
 .seo-hero__content h1{font-size:34px;line-height:1.12;font-weight:850;margin:0 0 14px;color:#111;letter-spacing:0}
 .seo-hero__content p{font-size:16px;line-height:1.7;color:#57534e;margin:0 0 22px;max-width:640px}
 .seo-hero__actions{display:flex;flex-wrap:wrap;gap:10px}
-.seo-hero__image{height:330px;border-radius:18px;background:#fafaf9;overflow:hidden}
+.seo-hero__image{height:330px;border-radius:18px;background:#fff;overflow:hidden}
 .seo-hero__image img{width:100%;height:100%;object-fit:cover}
 .seo-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 18px;border-radius:12px;font-size:14px;font-weight:800;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s}
 .seo-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(17,17,17,.1)}
@@ -258,27 +284,28 @@
 .seo-section{margin-top:36px}
 .seo-section__head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}
 .seo-section__head h2,.seo-faq h2,.seo-cta h2{font-size:24px;line-height:1.25;font-weight:850;color:#111;margin:0}
-.seo-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
+.seo-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:stretch}
 .seo-category-card{display:flex;flex-direction:column;height:100%;border:1px solid #eee;border-radius:18px;background:#fff;padding:18px;color:#111;text-decoration:none;box-shadow:0 8px 24px rgba(17,17,17,.04);transition:border-color .2s,box-shadow .2s,transform .2s}
 .seo-category-card:hover{border-color:#ff8a00;box-shadow:0 16px 34px rgba(17,17,17,.1);transform:translateY(-2px)}
-.seo-category-card__image{display:block;width:100%;height:180px;margin-bottom:16px;border-radius:12px;background:#fff;overflow:hidden}
-.seo-category-card__image img{display:block;width:100%;height:180px;object-fit:cover;border-radius:12px}
+.seo-category-card__image{display:flex;align-items:center;justify-content:center;width:100%;height:170px;margin-bottom:14px;border-radius:14px;background:#fafafa;overflow:hidden}
+.seo-category-card__image img{display:block;width:100%;height:100%;object-fit:contain;border-radius:14px}
+.seo-category-card__image--category img{object-fit:cover}
 .seo-category-card__body{display:flex;flex-direction:column;align-items:stretch;flex:1;min-width:0}
 .seo-category-card h3{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:50px;font-size:19px;line-height:1.3;font-weight:700;margin:0 0 8px;color:#111}
-.seo-category-card p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:66px;margin:0 0 18px;color:#666;font-size:14px;line-height:1.55}
+.seo-category-card p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:44px;margin:0 0 16px;color:#666;font-size:14px;line-height:1.55}
 .seo-category-card__button{display:flex;align-items:center;justify-content:center;width:100%;height:42px;margin-top:auto;padding:0 20px;border-radius:10px;background:#ff8a00;color:#fff;font-size:14px;font-weight:800;text-decoration:none;transition:background .2s,box-shadow .2s}
 .seo-category-card__button:hover{background:#ea7a00;color:#fff;box-shadow:0 10px 18px rgba(255,138,0,.24)}
 .seo-products-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.seo-text{max-width:900px;margin-top:42px;color:#444;font-size:16px;line-height:1.78}
+.seo-text{max-width:920px;margin-top:42px;color:#444;font-size:16px;line-height:1.75}
 .seo-text h2{font-size:24px;line-height:1.25;font-weight:850;color:#111;margin:34px 0 12px}
 .seo-text h3{font-size:20px;line-height:1.3;font-weight:800;color:#111;margin:26px 0 10px}
 .seo-text p{margin:0 0 16px}
 .seo-text ul,.seo-text ol{padding-left:22px;margin:0 0 18px}
 .seo-text a{color:#d97706;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
-.seo-cta{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-top:42px;padding:24px;border-radius:18px;background:#111;color:#fff;box-shadow:0 16px 38px rgba(17,17,17,.14)}
+.seo-cta{display:flex;align-items:center;justify-content:space-between;gap:22px;max-width:920px;margin-top:42px;padding:24px;border-radius:18px;background:#111;color:#fff;box-shadow:0 16px 38px rgba(17,17,17,.14)}
 .seo-cta p{margin:8px 0 0;max-width:700px;font-size:15px;line-height:1.65;color:#e7e5e4}
 .seo-cta h2{color:#fff}
-.seo-faq{max-width:820px;margin-top:42px}
+.seo-faq{max-width:920px;margin-top:42px}
 .seo-faq h2{margin-bottom:12px}
 @media (max-width: 980px){
     .seo-hero{grid-template-columns:1fr;padding:20px}
@@ -296,8 +323,8 @@
     .seo-btn{width:100%}
     .seo-benefits{grid-template-columns:1fr;gap:10px;margin-bottom:28px}
     .seo-category-grid{grid-template-columns:1fr;gap:12px}
-    .seo-category-card__image{height:180px;margin-bottom:14px}
-    .seo-category-card__image img{height:180px}
+    .seo-category-card__image{height:160px;margin-bottom:14px}
+    .seo-category-card p{-webkit-line-clamp:3;min-height:66px}
     .seo-category-card h3{font-size:18px}
     .seo-products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .seo-section__head h2,.seo-faq h2,.seo-cta h2,.seo-text h2{font-size:21px}

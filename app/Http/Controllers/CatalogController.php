@@ -140,6 +140,16 @@ class CatalogController extends Controller
                 ]),
                 'categories',
                 'categories.parent:id,slug',
+                'categories.products' => fn($q) => $q->active()
+                    ->whereNotNull('main_image')
+                    ->where('main_image', '!=', '')
+                    ->select(['id', 'category_id', 'main_image', 'is_active', 'is_hit', 'sort_order']),
+                'categories.children' => fn($q) => $q->active()
+                    ->select(['id', 'parent_id', 'name', 'slug', 'image', 'meta_description', 'seo_text_top']),
+                'categories.children.products' => fn($q) => $q->active()
+                    ->whereNotNull('main_image')
+                    ->where('main_image', '!=', '')
+                    ->select(['id', 'category_id', 'main_image', 'is_active', 'is_hit', 'sort_order']),
             ])
             ->first();
 
