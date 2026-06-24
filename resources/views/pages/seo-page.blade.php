@@ -145,25 +145,27 @@
     @if($categories->isNotEmpty())
     <section class="seo-section">
         <div class="seo-section__head">
-            <h2>Связанные категории</h2>
+            <h2>Популярные категории</h2>
         </div>
         <div class="seo-category-grid">
             @foreach($categories as $category)
-            <a class="seo-category-card" href="{{ $category->url }}">
-                @if(!empty($category->image))
-                <span class="seo-category-card__image">
-                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" loading="lazy">
-                </span>
+            @php
+                $fallbackProduct = $landingProducts->first(fn ($product) => (int) ($product->category_id ?? 0) === (int) $category->id && !empty($product->main_image));
+                $categoryImage = $category->image ?: ($fallbackProduct->main_image ?? null);
+                $categoryDescription = strip_tags($category->meta_description ?: $category->seo_text_top ?: 'Подборка моделей для офиса и дома.');
+            @endphp
+            <article class="seo-category-card">
+                @if(!empty($categoryImage))
+                <a class="seo-category-card__image" href="{{ $category->url }}" aria-label="{{ $category->name }}">
+                    <img src="{{ asset('storage/' . $categoryImage) }}" alt="{{ $category->name }}" loading="lazy">
+                </a>
                 @endif
-                <span class="seo-category-card__body">
-                    <strong>{{ $category->name }}</strong>
-                    @if(!empty($category->meta_description))
-                    <span>{{ \Illuminate\Support\Str::limit(strip_tags($category->meta_description), 120) }}</span>
-                    @elseif(!empty($category->seo_text_top))
-                    <span>{{ \Illuminate\Support\Str::limit(strip_tags($category->seo_text_top), 120) }}</span>
-                    @endif
-                </span>
-            </a>
+                <div class="seo-category-card__body">
+                    <h3>{{ $category->name }}</h3>
+                    <p>{{ $categoryDescription }}</p>
+                    <a class="seo-category-card__button" href="{{ $category->url }}">Смотреть</a>
+                </div>
+            </article>
             @endforeach
         </div>
     </section>
@@ -246,14 +248,16 @@
 .seo-section{margin-top:36px}
 .seo-section__head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:16px}
 .seo-section__head h2,.seo-faq h2,.seo-cta h2{font-size:24px;line-height:1.25;font-weight:850;color:#111;margin:0}
-.seo-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.seo-category-card{display:grid;grid-template-columns:116px minmax(0,1fr);gap:14px;align-items:center;border:1px solid #eee;border-radius:16px;background:#fff;padding:12px;color:#111;text-decoration:none;box-shadow:0 8px 24px rgba(17,17,17,.04);transition:border-color .2s,box-shadow .2s}
-.seo-category-card:hover{border-color:#ff8a00;box-shadow:0 12px 28px rgba(17,17,17,.08)}
-.seo-category-card__image{height:88px;border-radius:14px;background:#fafaf9;overflow:hidden}
-.seo-category-card__image img{width:100%;height:100%;object-fit:contain;padding:8px}
-.seo-category-card__body{min-width:0}
-.seo-category-card strong{display:block;font-size:15px;line-height:1.35;margin-bottom:6px;color:#111}
-.seo-category-card span span{display:block;font-size:13px;line-height:1.55;color:#666}
+.seo-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.seo-category-card{display:flex;flex-direction:column;min-height:100%;border:1px solid #eee;border-radius:18px;background:#fff;overflow:hidden;color:#111;text-decoration:none;box-shadow:0 8px 24px rgba(17,17,17,.04);transition:border-color .2s,box-shadow .2s,transform .2s}
+.seo-category-card:hover{border-color:#ff8a00;box-shadow:0 16px 34px rgba(17,17,17,.1);transform:translateY(-2px)}
+.seo-category-card__image{display:block;height:165px;background:#fff;overflow:hidden}
+.seo-category-card__image img{width:100%;height:100%;object-fit:contain;padding:12px}
+.seo-category-card__body{display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex:1;min-width:0;padding:18px 20px 20px}
+.seo-category-card h3{font-size:19px;line-height:1.3;font-weight:700;margin:0;color:#111}
+.seo-category-card p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:44px;margin:0;color:#666;font-size:14px;line-height:1.55}
+.seo-category-card__button{display:inline-flex;align-items:center;justify-content:center;margin-top:auto;min-height:42px;padding:10px 20px;border-radius:10px;background:#ff8a00;color:#fff;font-size:14px;font-weight:800;text-decoration:none;transition:background .2s,box-shadow .2s}
+.seo-category-card__button:hover{background:#ea7a00;color:#fff;box-shadow:0 10px 18px rgba(255,138,0,.24)}
 .seo-products-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .seo-text{max-width:900px;margin-top:42px;color:#444;font-size:16px;line-height:1.78}
 .seo-text h2{font-size:24px;line-height:1.25;font-weight:850;color:#111;margin:34px 0 12px}
@@ -281,9 +285,10 @@
     .seo-hero__image{height:230px}
     .seo-btn{width:100%}
     .seo-benefits{grid-template-columns:1fr;gap:10px;margin-bottom:28px}
-    .seo-category-grid{grid-template-columns:1fr}
-    .seo-category-card{grid-template-columns:90px minmax(0,1fr)}
-    .seo-category-card__image{height:76px}
+    .seo-category-grid{grid-template-columns:1fr;gap:12px}
+    .seo-category-card__image{height:155px}
+    .seo-category-card__body{padding:17px 18px 18px}
+    .seo-category-card h3{font-size:18px}
     .seo-products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
     .seo-section__head h2,.seo-faq h2,.seo-cta h2,.seo-text h2{font-size:21px}
     .seo-text{font-size:15px;line-height:1.72}
