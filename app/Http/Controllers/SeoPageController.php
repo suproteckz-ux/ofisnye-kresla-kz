@@ -23,6 +23,7 @@ class SeoPageController extends Controller
                     'category.parent:id,slug',
                 ]),
                 'categories',
+                'categories.parent:id,slug',
             ])
             ->first(); // first() → null, не исключение
 
@@ -35,7 +36,10 @@ class SeoPageController extends Controller
             ['name' => $page->seoH1()],
         ];
 
-        return view('pages.seo-page', compact('page', 'breadcrumbs'));
+        $relatedProducts = $page->relatedLandingProducts();
+        $heroImage = $page->heroImagePath($relatedProducts);
+
+        return view('pages.seo-page', compact('page', 'breadcrumbs', 'relatedProducts', 'heroImage'));
     }
 
     // ──────────────────────────────────────────────────────────────
