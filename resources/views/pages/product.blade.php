@@ -104,14 +104,36 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-thumb.is-active{border-color:#ff8a00;box-shadow:0 0 0 2px #ff8a0033}
 .prod-thumb img{width:100%;height:100%;object-fit:contain;pointer-events:none}
 .prod-lightbox[hidden]{display:none!important}
-.prod-lightbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:16px}
-.prod-lightbox img{max-width:min(90vw,1200px);max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
-.prod-lightbox-close{position:absolute;top:16px;right:16px;width:42px;height:42px;background:rgba(255,255,255,.15);border:0;border-radius:50%;color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:10000}
+.prod-lightbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:18px;overflow:hidden}
+.prod-lightbox__stage{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-width:0}
+.prod-lightbox__image-wrap{position:relative;display:flex;align-items:center;justify-content:center;max-width:90vw;max-height:85vh;min-width:0}
+.prod-lightbox__image{display:block;max-width:90vw;max-height:85vh;width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.prod-lightbox-close{position:absolute;top:16px;right:16px;width:48px;height:48px;background:rgba(255,255,255,.16);border:0;border-radius:50%;color:#fff;font-size:34px;line-height:1;cursor:pointer;z-index:10002}
 .prod-lightbox-close:hover{background:rgba(255,255,255,.3)}
+.prod-lightbox-arrow{position:absolute;top:50%;z-index:10001;transform:translateY(-50%);width:52px;height:52px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .2s,transform .2s}
+.prod-lightbox-arrow:hover{background:rgba(255,255,255,.32);transform:translateY(-50%) scale(1.04)}
+.prod-lightbox-arrow--prev{left:18px}
+.prod-lightbox-arrow--next{right:18px}
+.prod-lightbox-arrow svg{width:24px;height:24px}
+.prod-lightbox-count{position:absolute;left:50%;top:18px;transform:translateX(-50%);z-index:10001;color:#fff;background:rgba(0,0,0,.42);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800}
+.prod-lightbox-thumbs{display:flex;gap:8px;max-width:min(90vw,760px);width:100%;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 2px 8px;scrollbar-width:thin}
+.prod-lightbox-thumb{width:66px;height:66px;flex:0 0 66px;border:2px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);padding:3px;cursor:pointer;overflow:hidden}
+.prod-lightbox-thumb.is-active{border-color:#ff8a00;box-shadow:0 0 0 2px rgba(255,138,0,.28)}
+.prod-lightbox-thumb img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
 @media(max-width:640px){
     .prod-gallery-arrow{width:38px;height:38px}
     .prod-gallery-arrow--prev{left:8px}
     .prod-gallery-arrow--next{right:8px}
+    .prod-lightbox{padding:12px}
+    .prod-lightbox__stage{gap:10px;justify-content:center}
+    .prod-lightbox__image,.prod-lightbox__image-wrap{max-width:94vw;max-height:74vh}
+    .prod-lightbox-arrow{width:48px;height:48px}
+    .prod-lightbox-arrow--prev{left:10px}
+    .prod-lightbox-arrow--next{right:10px}
+    .prod-lightbox-close{top:10px;right:10px;width:46px;height:46px}
+    .prod-lightbox-count{top:12px;font-size:12px}
+    .prod-lightbox-thumbs{max-width:94vw}
+    .prod-lightbox-thumb{width:58px;height:58px;flex-basis:58px}
 }
 
 .product-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;margin-bottom:24px}
@@ -225,7 +247,38 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
       {{-- Lightbox --}}
       <div class="prod-lightbox" data-lightbox hidden>
         <button type="button" class="prod-lightbox-close" data-close-lightbox aria-label="Закрыть">×</button>
-        <img data-lightbox-image src="{{ $firstSrc }}" alt="{{ $product->name }}">
+        @if(count($allImages) > 1)
+        <button type="button" class="prod-lightbox-arrow prod-lightbox-arrow--prev" data-lightbox-prev aria-label="Предыдущее фото">
+          <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="prod-lightbox-arrow prod-lightbox-arrow--next" data-lightbox-next aria-label="Следующее фото">
+          <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="prod-lightbox-count" data-lightbox-counter>1 / {{ count($allImages) }}</div>
+        @endif
+        <div class="prod-lightbox__stage" data-lightbox-stage>
+          <div class="prod-lightbox__image-wrap">
+            <img class="prod-lightbox__image" data-lightbox-image src="{{ $firstSrc }}" alt="{{ $product->name }}">
+          </div>
+          @if(count($allImages) > 1)
+          <div class="prod-lightbox-thumbs" data-lightbox-thumbs>
+            @foreach($allImages as $i => $img)
+            <button type="button"
+                    class="prod-lightbox-thumb {{ $i === 0 ? 'is-active' : '' }}"
+                    data-lightbox-thumb
+                    data-index="{{ $i }}"
+                    aria-label="Показать фото {{ $i + 1 }} в увеличенном режиме">
+              <picture>
+                @if($img['webp'])
+                <source srcset="{{ $img['webp'] }}" type="image/webp">
+                @endif
+                <img src="{{ $img['src'] }}" alt="{{ $img['alt'] }}" loading="lazy">
+              </picture>
+            </button>
+            @endforeach
+          </div>
+          @endif
+        </div>
       </div>
     </div>
 
@@ -236,8 +289,13 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
             var mainSource = gallery.querySelector('[data-main-source]');
             var mainButton = gallery.querySelector('[data-open-lightbox]');
             var lightbox = gallery.querySelector('[data-lightbox]');
+            var lightboxStage = gallery.querySelector('[data-lightbox-stage]');
             var lightboxImage = gallery.querySelector('[data-lightbox-image]');
             var closeButton = gallery.querySelector('[data-close-lightbox]');
+            var lightboxCounter = gallery.querySelector('[data-lightbox-counter]');
+            var lightboxPrevButton = gallery.querySelector('[data-lightbox-prev]');
+            var lightboxNextButton = gallery.querySelector('[data-lightbox-next]');
+            var lightboxThumbs = Array.prototype.slice.call(gallery.querySelectorAll('[data-lightbox-thumb]'));
             var counter = gallery.querySelector('[data-photo-counter]');
             var prevButton = gallery.querySelector('[data-gallery-prev]');
             var nextButton = gallery.querySelector('[data-gallery-next]');
@@ -289,6 +347,17 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
                     lightboxImage.setAttribute('src', src);
                     if (alt) lightboxImage.setAttribute('alt', alt);
                 }
+
+                if (lightboxCounter) {
+                    lightboxCounter.textContent = (index + 1) + ' / ' + images.length;
+                }
+
+                lightboxThumbs.forEach(function (btn, btnIndex) {
+                    btn.classList.toggle('is-active', btnIndex === index);
+                    if (btnIndex === index && lightbox && !lightbox.hasAttribute('hidden')) {
+                        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
             }
 
             function shiftImage(step) {
@@ -299,6 +368,15 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
             function openLightbox() {
                 if (!activeSrc || !lightbox || !lightboxImage) return;
                 lightboxImage.setAttribute('src', activeSrc);
+                if (images[activeIndex] && images[activeIndex].alt) {
+                    lightboxImage.setAttribute('alt', images[activeIndex].alt);
+                }
+                if (lightboxCounter && images.length) {
+                    lightboxCounter.textContent = (activeIndex + 1) + ' / ' + images.length;
+                }
+                lightboxThumbs.forEach(function (btn, btnIndex) {
+                    btn.classList.toggle('is-active', btnIndex === activeIndex);
+                });
                 lightbox.removeAttribute('hidden');
                 document.body.style.overflow = 'hidden';
             }
@@ -339,6 +417,30 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
                 });
             }
 
+            if (lightboxPrevButton) {
+                lightboxPrevButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    shiftImage(-1);
+                });
+            }
+
+            if (lightboxNextButton) {
+                lightboxNextButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    shiftImage(1);
+                });
+            }
+
+            lightboxThumbs.forEach(function (btn, index) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActive(index);
+                });
+            });
+
             var touchStartX = null;
             if (mainButton) {
                 mainButton.addEventListener('touchstart', function (e) {
@@ -349,6 +451,21 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
                     var delta = e.changedTouches[0].clientX - touchStartX;
                     touchStartX = null;
                     if (Math.abs(delta) < 40) return;
+                    e.preventDefault();
+                    shiftImage(delta > 0 ? -1 : 1);
+                });
+            }
+
+            var lightboxTouchStartX = null;
+            if (lightboxStage) {
+                lightboxStage.addEventListener('touchstart', function (e) {
+                    lightboxTouchStartX = e.changedTouches[0].clientX;
+                }, { passive: true });
+                lightboxStage.addEventListener('touchend', function (e) {
+                    if (lightboxTouchStartX === null) return;
+                    var delta = e.changedTouches[0].clientX - lightboxTouchStartX;
+                    lightboxTouchStartX = null;
+                    if (Math.abs(delta) < 45) return;
                     e.preventDefault();
                     shiftImage(delta > 0 ? -1 : 1);
                 });
@@ -368,7 +485,16 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
             }
 
             document.addEventListener('keydown', function (e) {
+                if (!lightbox || lightbox.hasAttribute('hidden')) return;
                 if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    shiftImage(-1);
+                }
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    shiftImage(1);
+                }
             });
         });
     });
