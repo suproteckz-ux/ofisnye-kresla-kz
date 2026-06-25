@@ -100,15 +100,17 @@ class SecurityHeadersMiddleware
                 . "https://www.googletagmanager.com "
                 . "https://www.google-analytics.com "
                 . "https://connect.facebook.net "
-                . "https://mc.yandex.ru",
+                . "https://mc.yandex.ru "
+                . "https://kaspi.kz",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data: https: blob:",
             "connect-src 'self' "
                 . "https://www.google-analytics.com "
                 . "https://mc.yandex.ru "
-                . "https://api.whatsapp.com",
-            "frame-src 'none'",
+                . "https://api.whatsapp.com "
+                . "https://kaspi.kz",
+            "frame-src https://kaspi.kz",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self' https://wa.me",  // форма может вести на WhatsApp

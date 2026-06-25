@@ -205,5 +205,6 @@ button{font-family:inherit;cursor:pointer}
 @include('components.schema.local-business')
 @yield('schema')
 @include('components.ui.analytics')
+@stack('scripts')
 </body>
 </html>

@@ -102,9 +102,23 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-lightbox-close{position:absolute;top:16px;right:16px;width:42px;height:42px;background:rgba(255,255,255,.15);border:0;border-radius:50%;color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:10000}
 .prod-lightbox-close:hover{background:rgba(255,255,255,.3)}
 
+.product-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;margin-bottom:24px}
+.product-actions>a{min-height:50px}
+.kaspi-button-wrap{display:flex;align-items:center;min-height:50px}
+.kaspi-button-wrap .ks-widget{display:inline-flex}
+@media(max-width:640px){
+    .product-actions{flex-direction:column;align-items:stretch}
+    .product-actions>*{width:100%}
+    .product-actions>a{justify-content:center}
+}
 </style>
 @php $wa=\App\Services\CacheService::setting('whatsapp','');
 $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->url); @endphp
+@php
+$kaspiMerchantCode = trim((string) (config('kaspi.merchant_code') ?: config('services.kaspi.merchant_code')));
+$kaspiCityCode = trim((string) (config('kaspi.city_code') ?: config('services.kaspi.city_code')));
+$showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchantCode !== '' && $kaspiCityCode !== '';
+@endphp
 
 <div class="container" style="padding-top:24px;padding-bottom:48px">
   <div class="product-page-grid">
@@ -293,7 +307,7 @@ $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->
       <div style="font-size:13px;color:#999;margin-bottom:20px">Артикул: {{ $product->sku }}</div>
       @endif
 
-      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+      <div class="product-actions">
         @if($wa)
         <a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener"
            class="btn-wa" style="justify-content:center;font-size:16px;padding:15px">
@@ -308,6 +322,11 @@ $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->
           Быстрая консультация
           <svg width="15" height="15" fill="#22c55e" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
         </a>
+        @endif
+        @if($showKaspiButton)
+        <div class="kaspi-button-wrap">
+          <x-kaspi.credit-button :product="$product" />
+        </div>
         @endif
       </div>
 
@@ -404,4 +423,21 @@ $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->
   </a>
   @endif
 </div>
+
+@if($showKaspiButton)
+@push('scripts')
+@once
+<script>
+(function(d, s, id) {
+    var js, kjs;
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://kaspi.kz/kaspibutton/widget/ks-wi_ext.js';
+    kjs = document.getElementsByTagName(s)[0];
+    kjs.parentNode.insertBefore(js, kjs);
+}(document, 'script', 'KS-Widget'));
+</script>
+@endonce
+@endpush
+@endif
 @endsection
