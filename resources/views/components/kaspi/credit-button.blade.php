@@ -2,8 +2,8 @@
 
 @php
     $sku = trim((string) ($product->sku ?? ''));
-    $merchantCode = trim((string) (config('kaspi.merchant_code') ?: config('services.kaspi.merchant_code')));
-    $cityCode = trim((string) (config('kaspi.city_code') ?: config('services.kaspi.city_code')));
+    $merchantCode = trim((string) (config('kaspi.merchant_code') ?: config('services.kaspi.merchant_code') ?: 'Avtoximiya'));
+    $cityCode = trim((string) (config('kaspi.city_code') ?: config('services.kaspi.city_code') ?: '750000000'));
     $template = trim((string) (config('kaspi.button_template') ?: config('services.kaspi.button_template') ?: 'button'));
 
     if ($template !== 'button') {
