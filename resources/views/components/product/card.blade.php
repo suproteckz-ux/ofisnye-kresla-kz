@@ -50,11 +50,10 @@ if ($webp !== '') {
 .product-card__stock--out{background:#f4f4f5;color:#71717a}
 .product-card__body{padding:16px;display:flex;flex-direction:column;flex:1;min-width:0}
 .product-card__brand{font-size:11px;color:#d97706;font-weight:800;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase}
-.product-card__title{font-size:14px;font-weight:700;color:#111;line-height:1.38;margin-bottom:12px;min-height:39px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-decoration:none}
-.product-card__price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.product-card__title{font-size:14px;font-weight:700;color:#111;line-height:1.38;margin-bottom:10px;min-height:39px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-decoration:none}
+.product-card__footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto}
+.product-card__price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0;min-width:0}
 .product-card__price strong{font-size:18px;font-weight:900;color:#111}.product-card__price del{font-size:12px;color:#aaa}
-.product-card__actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:auto;align-items:center}
-.product-card__kaspi{display:flex;align-items:center;justify-content:center;min-height:36px;border:1px solid #ffd1c9;border-radius:10px;background:#fff5f2;color:#ef442f;font-size:12px;font-weight:850;text-decoration:none}
 .product-card__wa{width:38px;height:38px;border-radius:50%;background:#22c55e;color:#fff;display:grid;place-items:center;text-decoration:none;flex-shrink:0}
 @media(hover:hover) and (pointer:fine){
   .product-card:hover{transform:translateY(-3px);border-color:#f3d4aa;box-shadow:0 14px 34px rgba(17,17,17,.09)}
@@ -63,10 +62,8 @@ if ($webp !== '') {
 @media(max-width:640px){
   .product-card__media{height:150px!important}
   .product-card__body{padding:12px}
-  .product-card__title{font-size:12px;min-height:34px}
+  .product-card__title{font-size:12px;min-height:34px;margin-bottom:8px}
   .product-card__price strong{font-size:15px}
-  .product-card__actions{grid-template-columns:1fr 36px}
-  .product-card__kaspi{font-size:11px;min-height:36px}
   .product-card__wa{width:36px;height:36px}
 }
 </style>
@@ -115,19 +112,13 @@ if ($webp !== '') {
 
         <a href="{{ $product->url }}" class="product-card__title product-card-title">{{ $product->name }}</a>
 
-        <div class="product-card__price product-card-price">
-            <strong>{{ number_format($product->price, 0, '.', ' ') }} ₸</strong>
-            @if(!empty($product->old_price) && $product->old_price > $product->price)
-            <del>{{ number_format($product->old_price, 0, '.', ' ') }} ₸</del>
-            @endif
-        </div>
-
-        <div class="product-card__actions">
-            @if(!empty($product->sku))
-            <a href="{{ $product->url }}" class="product-card__kaspi product-card-button">Kaspi</a>
-            @else
-            <a href="{{ $product->url }}" class="product-card__kaspi product-card-button" style="background:#111;color:#fff;border-color:#111">Подробнее</a>
-            @endif
+        <div class="product-card__footer">
+            <div class="product-card__price product-card-price">
+                <strong>{{ number_format($product->price, 0, '.', ' ') }} ₸</strong>
+                @if(!empty($product->old_price) && $product->old_price > $product->price)
+                <del>{{ number_format($product->old_price, 0, '.', ' ') }} ₸</del>
+                @endif
+            </div>
             @if($wa)
             <a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener" class="product-card__wa" aria-label="Купить в WhatsApp">
                 <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
