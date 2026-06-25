@@ -91,8 +91,14 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 
 /* ── Product gallery clickable fix ── */
 .prod-main-photo-btn{position:absolute;inset:0;z-index:2;width:100%;height:100%;border:0;background:transparent;padding:0;cursor:zoom-in;display:block}
+.prod-main-photo-btn picture,.prod-main-photo-btn img{display:block;width:100%;height:100%}
 .prod-main-photo-btn img{pointer-events:none}
-.prod-photo-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);color:#fff;font-size:12px;padding:3px 8px;border-radius:99px;pointer-events:none;z-index:3;line-height:1.35;width:auto;max-width:max-content;white-space:nowrap}
+.prod-photo-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.56);color:#fff;font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;pointer-events:none;z-index:5;line-height:1.35;width:auto;max-width:max-content;white-space:nowrap}
+.prod-gallery-arrow{position:absolute;top:50%;z-index:4;transform:translateY(-50%);width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.9);color:#111;box-shadow:0 8px 20px rgba(0,0,0,.12);display:grid;place-items:center;cursor:pointer;transition:background .2s,transform .2s}
+.prod-gallery-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.04)}
+.prod-gallery-arrow--prev{left:12px}
+.prod-gallery-arrow--next{right:12px}
+.prod-gallery-arrow svg{width:18px;height:18px}
 .prod-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .prod-thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;background:#f8f8f8;border:2px solid transparent;cursor:pointer;padding:4px;transition:border-color .2s,box-shadow .2s;flex-shrink:0}
 .prod-thumb.is-active{border-color:#ff8a00;box-shadow:0 0 0 2px #ff8a0033}
@@ -102,6 +108,11 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-lightbox img{max-width:min(90vw,1200px);max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
 .prod-lightbox-close{position:absolute;top:16px;right:16px;width:42px;height:42px;background:rgba(255,255,255,.15);border:0;border-radius:50%;color:#fff;font-size:30px;line-height:1;cursor:pointer;z-index:10000}
 .prod-lightbox-close:hover{background:rgba(255,255,255,.3)}
+@media(max-width:640px){
+    .prod-gallery-arrow{width:38px;height:38px}
+    .prod-gallery-arrow--prev{left:8px}
+    .prod-gallery-arrow--next{right:8px}
+}
 
 .product-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;margin-bottom:24px}
 .product-actions>a{min-height:50px}
@@ -128,26 +139,29 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
     @php
     $allImages = [];
     $seenImagePaths = [];
-    $appendImage = function ($path, $alt = null) use (&$allImages, &$seenImagePaths, $product) {
+    $appendImage = function ($path, $alt = null, $webp = null) use (&$allImages, &$seenImagePaths, $product) {
         $normalizedPath = ltrim(trim((string) $path), '/');
         if ($normalizedPath === '' || isset($seenImagePaths[$normalizedPath])) {
             return;
         }
 
+        $normalizedWebp = ltrim(trim((string) $webp), '/');
         $seenImagePaths[$normalizedPath] = true;
         $allImages[] = [
             'src' => asset('storage/'.$normalizedPath),
+            'webp' => $normalizedWebp !== '' ? asset('storage/'.$normalizedWebp) : '',
             'alt' => $alt ?: $product->name,
         ];
     };
 
-    $appendImage($product->main_image, $product->main_image_alt);
+    $appendImage($product->main_image, $product->main_image_alt, $product->main_image_webp);
     if (method_exists($product, 'images')) {
         foreach ($product->images as $img) {
-            $appendImage($img->path, $img->alt);
+            $appendImage($img->path, $img->alt, $img->path_webp ?? null);
         }
     }
     $firstSrc = $allImages[0]['src'] ?? '';
+    $firstWebp = $allImages[0]['webp'] ?? '';
     @endphp
 
     <div class="product-gallery" data-product-gallery>
@@ -155,10 +169,13 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
       <div class="prod-img-box">
         @if($firstSrc)
         <button type="button" class="prod-main-photo-btn" data-open-lightbox aria-label="Открыть фото">
-          <img data-main-image src="{{ $firstSrc }}"
-               alt="{{ $product->name }}"
-               style="width:100%;height:100%;object-fit:contain;padding:24px;display:block"
-               loading="eager" fetchpriority="high">
+          <picture>
+            <source data-main-source srcset="{{ $firstWebp }}" type="image/webp" @if(!$firstWebp) disabled @endif>
+            <img data-main-image src="{{ $firstSrc }}"
+                 alt="{{ $product->name }}"
+                 style="width:100%;height:100%;object-fit:contain;padding:24px;display:block"
+                 loading="eager" fetchpriority="high">
+          </picture>
         </button>
         @else
         <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">
@@ -167,7 +184,13 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
         @endif
 
         @if(count($allImages) > 1)
-        <div class="prod-photo-count">{{ count($allImages) }} фото</div>
+        <button type="button" class="prod-gallery-arrow prod-gallery-arrow--prev" data-gallery-prev aria-label="Предыдущее фото">
+          <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="prod-gallery-arrow prod-gallery-arrow--next" data-gallery-next aria-label="Следующее фото">
+          <svg fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="prod-photo-count" data-photo-counter>1 / {{ count($allImages) }}</div>
         @endif
 
         <div style="position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;z-index:3;pointer-events:none">
@@ -183,10 +206,17 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
         <button type="button"
                 class="prod-thumb {{ $i === 0 ? 'is-active' : '' }}"
                 data-thumb
+                data-index="{{ $i }}"
                 data-src="{{ $img['src'] }}"
+                data-webp="{{ $img['webp'] }}"
                 data-alt="{{ $img['alt'] }}"
                 aria-label="Показать фото {{ $i + 1 }}">
-          <img src="{{ $img['src'] }}" alt="{{ $img['alt'] }}" loading="lazy">
+          <picture>
+            @if($img['webp'])
+            <source srcset="{{ $img['webp'] }}" type="image/webp">
+            @endif
+            <img src="{{ $img['src'] }}" alt="{{ $img['alt'] }}" loading="lazy">
+          </picture>
         </button>
         @endforeach
       </div>
@@ -203,26 +233,67 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('[data-product-gallery]').forEach(function (gallery) {
             var mainImage = gallery.querySelector('[data-main-image]');
+            var mainSource = gallery.querySelector('[data-main-source]');
             var mainButton = gallery.querySelector('[data-open-lightbox]');
             var lightbox = gallery.querySelector('[data-lightbox]');
             var lightboxImage = gallery.querySelector('[data-lightbox-image]');
             var closeButton = gallery.querySelector('[data-close-lightbox]');
+            var counter = gallery.querySelector('[data-photo-counter]');
+            var prevButton = gallery.querySelector('[data-gallery-prev]');
+            var nextButton = gallery.querySelector('[data-gallery-next]');
+            var thumbs = Array.prototype.slice.call(gallery.querySelectorAll('[data-thumb]'));
+            var images = thumbs.map(function (btn) {
+                return {
+                    src: btn.getAttribute('data-src'),
+                    webp: btn.getAttribute('data-webp'),
+                    alt: btn.getAttribute('data-alt') || ''
+                };
+            });
+            var activeIndex = 0;
             var activeSrc = mainImage ? mainImage.getAttribute('src') : '';
 
-            function setActive(src, alt) {
+            function setActive(index) {
+                if (!images.length) return;
+                if (index < 0) index = images.length - 1;
+                if (index >= images.length) index = 0;
+
+                var image = images[index];
+                var src = image.src;
+                var alt = image.alt;
                 if (!src || !mainImage) return;
+
+                activeIndex = index;
                 activeSrc = src;
                 mainImage.setAttribute('src', src);
                 if (alt) mainImage.setAttribute('alt', alt);
 
-                gallery.querySelectorAll('[data-thumb]').forEach(function (btn) {
-                    btn.classList.toggle('is-active', btn.getAttribute('data-src') === src);
+                if (mainSource) {
+                    if (image.webp) {
+                        mainSource.setAttribute('srcset', image.webp);
+                        mainSource.removeAttribute('disabled');
+                    } else {
+                        mainSource.removeAttribute('srcset');
+                        mainSource.setAttribute('disabled', 'disabled');
+                    }
+                }
+
+                thumbs.forEach(function (btn, btnIndex) {
+                    btn.classList.toggle('is-active', btnIndex === index);
                 });
+
+                if (counter) {
+                    counter.textContent = (index + 1) + ' / ' + images.length;
+                }
 
                 if (lightbox && !lightbox.hasAttribute('hidden') && lightboxImage) {
                     lightboxImage.setAttribute('src', src);
                     if (alt) lightboxImage.setAttribute('alt', alt);
                 }
+            }
+
+            function shiftImage(step) {
+                if (images.length < 2) return;
+                setActive(activeIndex + step);
             }
 
             function openLightbox() {
@@ -245,12 +316,43 @@ $showKaspiButton = trim((string) ($product->sku ?? '')) !== '' && $kaspiMerchant
                 });
             }
 
-            gallery.querySelectorAll('[data-thumb]').forEach(function (btn) {
+            thumbs.forEach(function (btn, index) {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
-                    setActive(btn.getAttribute('data-src'), btn.getAttribute('data-alt'));
+                    setActive(index);
                 });
             });
+
+            if (prevButton) {
+                prevButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    shiftImage(-1);
+                });
+            }
+
+            if (nextButton) {
+                nextButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    shiftImage(1);
+                });
+            }
+
+            var touchStartX = null;
+            if (mainButton) {
+                mainButton.addEventListener('touchstart', function (e) {
+                    touchStartX = e.changedTouches[0].clientX;
+                }, { passive: true });
+                mainButton.addEventListener('touchend', function (e) {
+                    if (touchStartX === null) return;
+                    var delta = e.changedTouches[0].clientX - touchStartX;
+                    touchStartX = null;
+                    if (Math.abs(delta) < 40) return;
+                    e.preventDefault();
+                    shiftImage(delta > 0 ? -1 : 1);
+                });
+            }
 
             if (closeButton) {
                 closeButton.addEventListener('click', function (e) {

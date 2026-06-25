@@ -6,6 +6,36 @@
     $footerCats = \Illuminate\Support\Facades\Cache::remember('footer.cats', 3600,
         fn() => \App\Models\Category::active()->root()->ordered()->limit(5)->get()
     );
+    $footerSeoPages = \Illuminate\Support\Facades\Cache::remember('footer.seo_pages', 3600, function () {
+        $preferred = [
+            'ofisnye-kresla-almaty',
+            'kupit-ofisnoe-kreslo-v-almaty',
+            'kresla-rukovoditelia-almaty',
+            'ergonomicnye-kresla-almaty',
+            'ergonomichnye-kresla-almaty',
+            'ofisnye-kresla-s-podgolovnikom-almaty',
+            'kresla-dlia-sotrudnikov',
+            'ofisnye-kresla-dlia-iuridiceskix-lic',
+            'ofisnye-kresla-optom',
+        ];
+
+        $pages = \App\Models\SeoPage::active()
+            ->whereIn('slug', $preferred)
+            ->get()
+            ->sortBy(fn ($page) => array_search($page->slug, $preferred, true))
+            ->values();
+
+        if ($pages->count() < 8) {
+            $extra = \App\Models\SeoPage::active()
+                ->whereNotIn('slug', $pages->pluck('slug')->all())
+                ->latest('updated_at')
+                ->limit(8 - $pages->count())
+                ->get();
+            $pages = $pages->concat($extra)->values();
+        }
+
+        return $pages->take(8);
+    });
 @endphp
 
 <footer style="background:#111;color:#aaa;margin-top:auto">
@@ -53,7 +83,18 @@
                 <a href="{{ route('delivery-payment') }}#warranty" style="display:block;font-size:13px;color:#777">Гарантия</a>
             </div>
 
-            {{-- Колонка 4: Контакты --}}
+            {{-- Колонка 4: Полезное --}}
+            <div>
+                <a href="{{ route('seo-pages.index') }}" style="display:block;color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Полезное</a>
+                @foreach($footerSeoPages as $seoPage)
+                <a href="{{ $seoPage->url }}"
+                   style="display:block;font-size:13px;color:#777;margin-bottom:8px;text-decoration:none;transition:color .15s"
+                   onmouseover="this.style.color='#fff'"
+                   onmouseout="this.style.color='#777'">{{ $seoPage->seoH1() }}</a>
+                @endforeach
+            </div>
+
+            {{-- Колонка 5: Контакты --}}
             <div>
                 <a href="{{ route('contacts') }}" style="display:block;color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Контакты</a>
                 @if($address)
@@ -93,5 +134,5 @@
   .footer-cols>div:first-child,.footer-cols>div:last-child{grid-column:1/-1}
 }
 @media(min-width:640px){.footer-cols{grid-template-columns:repeat(2,1fr);gap:32px}}
-@media(min-width:1024px){.footer-cols{grid-template-columns:2fr 1fr 1fr 1.5fr;gap:40px}}
+@media(min-width:1024px){.footer-cols{grid-template-columns:1.7fr 1fr 1fr 1.35fr 1.35fr;gap:34px}}
 </style>

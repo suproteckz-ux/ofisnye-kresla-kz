@@ -175,7 +175,11 @@
                             : \App\Models\Category::active()->where('parent_id', $category->id)->pluck('id')->all();
 
                         $fallbackProduct = \App\Models\Product::active()
-                            ->whereIn('category_id', array_merge([$category->id], $childIds))
+                            ->where(function ($query) use ($category, $childIds) {
+                                $ids = array_merge([$category->id], $childIds);
+                                $query->whereIn('category_id', $ids)
+                                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $ids));
+                            })
                             ->whereNotNull('main_image')
                             ->where('main_image', '!=', '')
                             ->orderByDesc('is_hit')

@@ -48,6 +48,7 @@ class Category extends Model
     public function children(): HasMany  { return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order'); }
     public function allChildren(): HasMany { return $this->children()->with('allChildren'); }
     public function products(): HasMany  { return $this->hasMany(Product::class); }
+    public function linkedProducts(): BelongsToMany { return $this->belongsToMany(Product::class, 'product_category')->withTimestamps(); }
     public function seoPages(): BelongsToMany { return $this->belongsToMany(SeoPage::class, 'seo_page_category'); }
     public function seoFilters(): HasMany     { return $this->hasMany(SeoFilter::class); }
 

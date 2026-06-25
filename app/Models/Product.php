@@ -143,6 +143,7 @@ class Product extends Model
 
     // Связи
     public function category(): BelongsTo { return $this->belongsTo(Category::class); }
+    public function categories(): BelongsToMany { return $this->belongsToMany(Category::class, 'product_category')->withTimestamps(); }
     public function brand(): BelongsTo    { return $this->belongsTo(Brand::class); }
     public function images(): HasMany     { return $this->hasMany(ProductImage::class)->orderBy('sort_order'); }
     public function seoPages(): BelongsToMany  { return $this->belongsToMany(SeoPage::class, 'seo_page_product'); }
@@ -154,7 +155,13 @@ class Product extends Model
     public function scopeHits(Builder $q): Builder     { return $q->where('is_hit', true)->where('is_active', true); }
     public function scopeNew(Builder $q): Builder      { return $q->where('is_new', true)->where('is_active', true); }
     public function scopePopular(Builder $q): Builder  { return $q->where('is_popular', true)->where('is_active', true); }
-    public function scopeInCategory(Builder $q, int $id): Builder { return $q->where('category_id', $id); }
+    public function scopeInCategory(Builder $q, int $id): Builder
+    {
+        return $q->where(function (Builder $query) use ($id) {
+            $query->where('category_id', $id)
+                ->orWhereHas('categories', fn (Builder $categoryQuery) => $categoryQuery->where('categories.id', $id));
+        });
+    }
     public function scopeByBrand(Builder $q, int $id): Builder    { return $q->where('brand_id', $id); }
 
     public function scopePriceBetween(Builder $q, ?float $min, ?float $max): Builder

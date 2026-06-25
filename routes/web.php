@@ -45,6 +45,7 @@ Route::get('/blog/{post}', [BlogController::class, 'show'])
 Route::get('/akcii', [InformationPageController::class, 'promotions'])->name('promotions');
 Route::get('/delivery-payment', [InformationPageController::class, 'deliveryPayment'])->name('delivery-payment');
 Route::get('/contacts', [InformationPageController::class, 'contacts'])->name('contacts');
+Route::get('/poleznoe', [SeoPageController::class, 'index'])->name('seo-pages.index');
 
 // Health check
 Route::get('/health', function () {

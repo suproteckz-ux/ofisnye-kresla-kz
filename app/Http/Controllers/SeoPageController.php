@@ -8,6 +8,25 @@ use App\Models\SeoPage;
 
 class SeoPageController extends Controller
 {
+    public function index()
+    {
+        $pages = SeoPage::active()
+            ->select([
+                'id', 'title', 'slug', 'h1', 'hero_image', 'hero_subtitle',
+                'meta_description', 'updated_at',
+            ])
+            ->orderByDesc('updated_at')
+            ->get();
+
+        $breadcrumbs = [
+            ['name' => 'Полезное'],
+        ];
+
+        $canonical = url('/poleznoe');
+
+        return view('pages.seo-index', compact('pages', 'breadcrumbs', 'canonical'));
+    }
+
     // ──────────────────────────────────────────────────────────────
     // /{slug} — SEO-страница из БД
     // ──────────────────────────────────────────────────────────────
@@ -77,13 +96,17 @@ class SeoPageController extends Controller
 
         // Товары этой категории + бренда
         $products = Product::active()
-            ->where('category_id', $filter->category_id)
+            ->where(function ($query) use ($filter) {
+                $query->where('category_id', $filter->category_id)
+                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->where('categories.id', $filter->category_id));
+            })
             ->where('brand_id',    $filter->brand_id)
             ->with([
                 'brand:id,name,slug',
                 'category:id,name,slug,parent_id',
                 'category.parent:id,slug',
             ])
+            ->distinct()
             ->orderByDesc('is_hit')
             ->paginate(24);
 

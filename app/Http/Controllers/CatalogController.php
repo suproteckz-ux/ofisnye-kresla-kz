@@ -214,9 +214,13 @@ class CatalogController extends Controller
 
         if ($filter) {
             $products = Product::active()
-                ->where('category_id', $filter->category_id)
+                ->where(function ($query) use ($filter) {
+                    $query->where('category_id', $filter->category_id)
+                        ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->where('categories.id', $filter->category_id));
+                })
                 ->where('brand_id',    $filter->brand_id)
                 ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug'])
+                ->distinct()
                 ->orderByDesc('is_hit')
                 ->paginate(24);
 
@@ -270,11 +274,18 @@ class CatalogController extends Controller
         }
 
         $brands = Brand::active()
-            ->whereHas('products', fn($q) => $q->active()->whereIn('category_id', $categoryIds))
+            ->whereHas('products', fn($q) => $q->active()->where(function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds)
+                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds));
+            }))
             ->ordered()->get();
 
         $query = Product::active()
-            ->whereIn('category_id', $categoryIds)
+            ->where(function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds)
+                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds));
+            })
+            ->distinct()
             ->with(['brand:id,name,slug', 'category:id,name,slug,parent_id', 'category.parent:id,slug']);
 
         $hasFilters = false;
@@ -325,7 +336,10 @@ class CatalogController extends Controller
         $products = $query->paginate(self::PER_PAGE)->withQueryString();
 
         $priceRange = Product::active()
-            ->whereIn('category_id', $categoryIds)
+            ->where(function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds)
+                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds));
+            })
             ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
             ->first();
 
@@ -383,7 +397,10 @@ class CatalogController extends Controller
         $attrNames = array_keys(self::FILTERABLE_ATTRIBUTES);
 
         $products = Product::active()
-            ->whereIn('category_id', $categoryIds)
+            ->where(function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds)
+                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds));
+            })
             ->whereNotNull('attributes')
             ->select('attributes')
             ->get();

@@ -192,6 +192,13 @@ class SitemapController extends Controller
                 priority:   '0.8'
             );
 
+            $items .= $this->urlEntry(
+                loc:        url('/poleznoe'),
+                lastmod:    SeoPage::active()->max('updated_at') ?: $lastProduct,
+                changefreq: 'weekly',
+                priority:   '0.7'
+            );
+
             foreach (['/akcii', '/delivery-payment', '/contacts'] as $staticPage) {
                 $items .= $this->urlEntry(
                     loc:        url($staticPage),

@@ -76,12 +76,16 @@ class SeoPage extends Model
         }
 
         return Product::active()
-            ->whereIn('category_id', $categoryIds)
+            ->where(function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds)
+                    ->orWhereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds));
+            })
             ->with([
                 'brand',
                 'category:id,name,slug,parent_id',
                 'category.parent:id,slug',
             ])
+            ->distinct()
             ->orderByDesc('is_hit')
             ->orderByDesc('is_popular')
             ->orderBy('sort_order')

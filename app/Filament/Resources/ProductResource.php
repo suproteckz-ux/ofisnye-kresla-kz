@@ -87,6 +87,15 @@ class ProductResource extends Resource
                         ->preload()
                         ->nullable(),
 
+                    Select::make('categories')
+                        ->label('Категории')
+                        ->relationship('categories', 'name')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Основная категория выше остается для canonical URL и хлебных крошек.')
+                        ->nullable(),
+
                     Select::make('brand_id')
                         ->label('Бренд')
                         ->relationship('brand', 'name')
