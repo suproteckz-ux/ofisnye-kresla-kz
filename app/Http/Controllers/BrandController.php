@@ -25,8 +25,8 @@ class BrandController extends Controller
         $currentPage = (int) $request->get('page', 1);
         $products = $query->paginate(24)->withQueryString();
         $baseUrl = url("/brand/{$brand->slug}");
-        $noindex = $sort !== 'default';
-        $canonical = ($currentPage > 1 && !$noindex) ? $products->url($currentPage) : $baseUrl;
+        $noindex = $sort !== 'default' || $currentPage > 1;
+        $canonical = $baseUrl;
         $ogImage = $brand->logo ? asset('storage/' . $brand->logo) : asset('img/og-default.jpg');
         return view('pages.brand', compact('brand', 'products', 'sort', 'canonical', 'noindex', 'currentPage', 'ogImage'));
     }

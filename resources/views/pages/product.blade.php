@@ -14,6 +14,7 @@ $schemaProd=[
         '@type'=>'Offer','priceCurrency'=>'KZT',
         'price'=>(float)$product->price,
         'availability'=>$product->in_stock?'https://schema.org/InStock':'https://schema.org/OutOfStock',
+        'url'=>$product->url,
         'seller'=>['@type'=>'Organization','name'=>config('app.name')],
     ],
 ];

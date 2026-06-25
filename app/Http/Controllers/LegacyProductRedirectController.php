@@ -75,7 +75,7 @@ class LegacyProductRedirectController extends Controller
 
         $productId = null;
         foreach ($skuIndex as $sku => $id) {
-            if (str_starts_with($normalizedSlug, $sku)) {
+            if (str_contains($normalizedSlug, $sku)) {
                 $productId = $id;
                 break;
             }

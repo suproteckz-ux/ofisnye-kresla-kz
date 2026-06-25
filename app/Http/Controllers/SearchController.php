@@ -22,7 +22,7 @@ class SearchController extends Controller
 
         return response()
             ->view('pages.search', compact('query', 'products'))
-            ->header('X-Robots-Tag', 'noindex, nofollow');
+            ->header('X-Robots-Tag', 'noindex, follow');
     }
 
     private function search(string $query): \Illuminate\Contracts\Pagination\LengthAwarePaginator

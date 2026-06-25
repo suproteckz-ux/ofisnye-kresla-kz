@@ -356,8 +356,8 @@ class CatalogController extends Controller
             $canonical = $baseUrl;
             $noindex   = true;
         } elseif ($currentPage > 1) {
-            $canonical = $products->url($currentPage);
-            $noindex   = false;
+            $canonical = $baseUrl;
+            $noindex   = true;
         } else {
             $canonical = $baseUrl;
             $noindex   = false;

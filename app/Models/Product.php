@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -38,11 +39,94 @@ class Product extends Model
         'is_popular' => 'boolean',
     ];
 
+    public function seoTitle(): string
+    {
+        $stored = $this->attributes['meta_title'] ?? null;
+
+        if ($stored && ! $this->isSpammySeoTitle($stored)) {
+            return $this->limitSeoTitle($this->cleanSeoTitle($stored));
+        }
+
+        return $this->defaultSeoTitle();
+    }
+
     protected function defaultSeoTitle(): string
     {
-        $name = $this->attributes['name'] ?? '';
-        $price = number_format((float)($this->attributes['price'] ?? 0), 0, '.', ' ');
-        return "{$name} — купить в Алматы за {$price} ₸ | " . config('app.name');
+        $name = $this->cleanProductTitleName($this->attributes['name'] ?? '');
+        $suffix = ' — купить в Алматы | Офисные кресла';
+        $maxNameLength = max(20, 70 - mb_strlen($suffix));
+
+        return Str::limit($name, $maxNameLength, '') . $suffix;
+    }
+
+    public function hasProblemSeoTitle(): bool
+    {
+        return $this->seoTitleAuditReasons() !== [];
+    }
+
+    public function seoTitleAuditReasons(): array
+    {
+        $title = $this->seoTitle();
+        $reasons = [];
+
+        if ($title === '') {
+            $reasons[] = 'empty';
+        }
+        if (mb_strlen($title) > 70) {
+            $reasons[] = 'too_long';
+        }
+        if ($this->hasRepeatedSeoPhrase($title)) {
+            $reasons[] = 'repeated_phrase';
+        }
+        if ($this->hasForbiddenSeoPhrase($title)) {
+            $reasons[] = 'forbidden_phrase';
+        }
+
+        return $reasons;
+    }
+
+    private function isSpammySeoTitle(string $title): bool
+    {
+        return mb_strlen($title) > 70
+            || $this->hasRepeatedSeoPhrase($title)
+            || $this->hasForbiddenSeoPhrase($title);
+    }
+
+    private function cleanSeoTitle(string $title): string
+    {
+        $title = strip_tags($title);
+        $title = preg_replace('/\s+/u', ' ', $title) ?? $title;
+        $title = str_replace([' | | ', ' — — '], [' | ', ' — '], $title);
+
+        return trim($title);
+    }
+
+    private function cleanProductTitleName(string $name): string
+    {
+        $name = $this->cleanSeoTitle($name);
+        $name = preg_replace('/\s+(купить|заказать)\s+в\s+алматы.*$/iu', '', $name) ?? $name;
+        $name = preg_replace('/\s+где\s+выгодно\s+приобрести.*$/iu', '', $name) ?? $name;
+
+        return trim($name) ?: 'Офисное кресло';
+    }
+
+    private function limitSeoTitle(string $title): string
+    {
+        if (mb_strlen($title) <= 70) {
+            return $title;
+        }
+
+        return $this->defaultSeoTitle();
+    }
+
+    private function hasRepeatedSeoPhrase(string $title): bool
+    {
+        return preg_match_all('/офисные\s+кресла/iu', $title) > 1;
+    }
+
+    private function hasForbiddenSeoPhrase(string $title): bool
+    {
+        return preg_match('/где\s+выгодно\s+приобрести|заказать\s+офисные\s+кресла|офисные\s+кресла\s+магазин/iu', $title) === 1;
     }
 
     protected function defaultSeoDescription(): string

@@ -2,6 +2,9 @@
 
 @section('title', $metaTitle)
 @section('description', $metaDesc)
+@if($noindex ?? false)
+@section('noindex', true)
+@endif
 
 @section('canonical')
 <link rel="canonical" href="{{ $canonical }}">

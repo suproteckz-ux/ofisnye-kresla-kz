@@ -17,7 +17,8 @@ class BlogController extends Controller
         $currentPage = (int) $request->get('page', 1);
         $baseUrl     = url('/blog');
 
-        $canonical = $currentPage > 1 ? $posts->url($currentPage) : $baseUrl;
+        $canonical = $baseUrl;
+        $noindex = $currentPage > 1;
 
         $appName = config('app.name');
 
@@ -28,7 +29,7 @@ class BlogController extends Controller
         $metaDesc = 'Статьи о выборе офисных кресел. Как выбрать эргономичное кресло, '
             . 'кресло для руководителя, обзоры и сравнения моделей. Советы экспертов.';
 
-        return view('pages.blog', compact('posts', 'canonical', 'currentPage', 'metaTitle', 'metaDesc'));
+        return view('pages.blog', compact('posts', 'canonical', 'currentPage', 'metaTitle', 'metaDesc', 'noindex'));
     }
 
     public function show(string $slug)

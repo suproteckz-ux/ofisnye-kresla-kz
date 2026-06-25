@@ -67,34 +67,18 @@ Route::get('/sitemap-seo-filters.xml', [SitemapController::class, 'seoFilters'])
 
 // Robots.txt
 Route::get('/robots.txt', function () {
-    $appUrl = rtrim(config('app.url'), '/');
     $lines = [
         'User-agent: *',
         '',
         'Disallow: /admin',
-        'Disallow: /lead',
-        'Disallow: /health',
-        'Disallow: /up',
-        'Disallow: /livewire',
-        'Disallow: /_ignition',
         'Disallow: /login',
-        'Disallow: /image/cache/',
+        'Disallow: /register',
         'Disallow: /search',
-        'Disallow: /*?*brand=*',
-        'Disallow: /*?*price_min=*',
-        'Disallow: /*?*price_max=*',
-        'Disallow: /*?*in_stock=*',
-        'Disallow: /*?*sort=*',
-        'Disallow: /*?*order=*',
-        'Disallow: /*?*limit=*',
-        'Disallow: /*?*tag=*',
-        'Disallow: /*?*material=*',
-        'Disallow: /*?*type=*',
-        'Disallow: /*?*color=*',
-        'Disallow: /*?*mechanism=*',
-        'Disallow: /*?*load=*',
+        'Disallow: /api/',
+        'Disallow: /telescope',
+        'Disallow: /horizon',
         '',
-        "Sitemap: {$appUrl}/sitemap.xml",
+        'Sitemap: https://xn----8sbnbmoilhzgg4a5h.kz/sitemap.xml',
     ];
     return response(implode("\n", $lines), 200, [
         'Content-Type'  => 'text/plain; charset=UTF-8',
