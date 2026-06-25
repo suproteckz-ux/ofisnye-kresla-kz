@@ -16,12 +16,11 @@ $hasDiscount = method_exists($product, 'hasDiscount')
     : (!empty($product->old_price) && $product->old_price > $product->price);
 
 $wa = \App\Services\CacheService::setting('whatsapp', '');
-$waMsg = urlencode('Хочу заказать: ' . ($product->name ?? '') . ' — ' . config('app.name'));
+$waMsg = urlencode('Хочу заказать: ' . ($product->name ?? '') . ' - ' . config('app.name'));
 $image = ltrim((string) ($product->main_image ?? ''), '/');
 $webp = ltrim((string) ($product->main_image_webp ?? ''), '/');
 $disk = \Illuminate\Support\Facades\Storage::disk('public');
 $srcset = '';
-$thumb = $image ? asset('storage/' . $image) : asset('img/no-photo.svg');
 
 if ($webp !== '') {
     $directory = trim(dirname($webp), '.\\/');
@@ -35,31 +34,20 @@ if ($webp !== '') {
         }
     }
 
-    $thumbPath = ($directory !== '' ? $directory . '/' : '') . "{$name}-thumb.webp";
-    if ($disk->exists($thumbPath)) {
-        $thumb = asset('storage/' . $thumbPath);
-    }
-
     $srcset = implode(', ', $items);
 }
 @endphp
 
 @once
 <style>
-.product-card{position:relative;background:#fff;border-radius:16px;border:1px solid #ececec;overflow:hidden;display:flex;flex-direction:column;height:100%;box-shadow:0 6px 18px rgba(17,17,17,.035);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
-.product-card:hover{transform:translateY(-3px);border-color:#f3d4aa;box-shadow:0 14px 34px rgba(17,17,17,.09)}
+.product-card{position:relative;background:#fff;border-radius:16px;border:1px solid #ececec;overflow:hidden;display:flex;flex-direction:column;height:100%;box-shadow:0 6px 18px rgba(17,17,17,.035);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;cursor:pointer}
 .product-card__media{display:block;position:relative;background:#fafafa;overflow:hidden;flex-shrink:0;height:180px!important}
-.product-card__media img{width:100%;height:100%;object-fit:contain;padding:14px;position:absolute;inset:0;transition:transform .28s ease}
-.product-card:hover .product-card__media img{transform:scale(1.035)}
+.product-card__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:14px;transition:transform .28s ease}
 .product-card__badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:5px;z-index:2}
 .product-card__badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
 .product-card__badge--new{background:#14b8a6}.product-card__badge--hit{background:#8b5cf6}.product-card__badge--sale{background:#ff5a1f}
-.product-card__tools{position:absolute;top:9px;right:9px;display:flex;flex-direction:column;gap:6px;z-index:3}
-.product-card__icon{width:30px;height:30px;border:1px solid #e8e8e8;border-radius:50%;background:rgba(255,255,255,.9);color:#64748b;display:grid;place-items:center;cursor:pointer;transition:color .18s,border-color .18s,background .18s}
-.product-card__icon:hover,.product-card__icon.is-active{color:#ff8a00;border-color:#ff8a00;background:#fff7ed}
-.product-card__quick{position:absolute;right:10px;top:136px;z-index:3;width:34px;height:34px;border:0;border-radius:50%;background:rgba(17,17,17,.46);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .18s,transform .18s}
-.product-card__quick:hover{background:#111;transform:scale(1.04)}
 .product-card__stock{position:absolute;left:10px;bottom:10px;z-index:2;font-size:10px;font-weight:700;padding:3px 8px;background:#eafaf0;color:#16a34a;border-radius:999px}
+.product-card__stock--out{background:#f4f4f5;color:#71717a}
 .product-card__body{padding:16px;display:flex;flex-direction:column;flex:1;min-width:0}
 .product-card__brand{font-size:11px;color:#d97706;font-weight:800;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase}
 .product-card__title{font-size:14px;font-weight:700;color:#111;line-height:1.38;margin-bottom:12px;min-height:39px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-decoration:none}
@@ -67,78 +55,28 @@ if ($webp !== '') {
 .product-card__price strong{font-size:18px;font-weight:900;color:#111}.product-card__price del{font-size:12px;color:#aaa}
 .product-card__actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:auto;align-items:center}
 .product-card__kaspi{display:flex;align-items:center;justify-content:center;min-height:36px;border:1px solid #ffd1c9;border-radius:10px;background:#fff5f2;color:#ef442f;font-size:12px;font-weight:850;text-decoration:none}
-.product-card__wa{width:38px;height:38px;border-radius:50%;background:#22c55e;color:#fff;display:grid;place-items:center;text-decoration:none}
-.product-quick[hidden]{display:none!important}
-.product-quick{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.52);display:grid;place-items:center;padding:18px}
-.product-quick__box{width:min(720px,100%);background:#fff;border-radius:18px;box-shadow:0 28px 80px rgba(0,0,0,.28);display:grid;grid-template-columns:260px 1fr;gap:20px;padding:18px;position:relative}
-.product-quick__close{position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:#f3f3f3;font-size:24px;line-height:1}
-.product-quick__image{background:#f8f8f8;border-radius:14px;aspect-ratio:1;display:grid;place-items:center;overflow:hidden}
-.product-quick__image img{width:100%;height:100%;object-fit:contain;padding:16px}
+.product-card__wa{width:38px;height:38px;border-radius:50%;background:#22c55e;color:#fff;display:grid;place-items:center;text-decoration:none;flex-shrink:0}
+@media(hover:hover) and (pointer:fine){
+  .product-card:hover{transform:translateY(-3px);border-color:#f3d4aa;box-shadow:0 14px 34px rgba(17,17,17,.09)}
+  .product-card:hover .product-card__media img{transform:scale(1.035)}
+}
 @media(max-width:640px){
-  .product-card__media{height:150px!important}.product-card__quick{top:114px}.product-card__body{padding:12px}.product-card__title{font-size:12px;min-height:34px}.product-card__price strong{font-size:15px}
-  .product-card__actions{grid-template-columns:1fr 36px}.product-card__kaspi{font-size:11px;min-height:36px}.product-card__wa{width:36px;height:36px}
-  .product-quick__box{grid-template-columns:1fr;max-height:92vh;overflow:auto}.product-quick__image{max-height:280px}
+  .product-card__media{height:150px!important}
+  .product-card__body{padding:12px}
+  .product-card__title{font-size:12px;min-height:34px}
+  .product-card__price strong{font-size:15px}
+  .product-card__actions{grid-template-columns:1fr 36px}
+  .product-card__kaspi{font-size:11px;min-height:36px}
+  .product-card__wa{width:36px;height:36px}
 }
 </style>
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var readSet = function (key) {
-        try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; }
-    };
-    var writeSet = function (key, values) { localStorage.setItem(key, JSON.stringify(values)); };
-    var toggleStored = function (button, key) {
-        var id = button.getAttribute('data-product-id');
-        var values = readSet(key);
-        var exists = values.indexOf(id) !== -1;
-        values = exists ? values.filter(function (item) { return item !== id; }) : values.concat([id]);
-        writeSet(key, values);
-        button.classList.toggle('is-active', !exists);
-    };
-
-    document.querySelectorAll('[data-product-card]').forEach(function (card) {
-        ['favorite', 'compare'].forEach(function (type) {
-            var button = card.querySelector('[data-' + type + ']');
-            if (!button) return;
-            button.classList.toggle('is-active', readSet('product_' + type).indexOf(button.getAttribute('data-product-id')) !== -1);
-        });
-    });
-
-    document.addEventListener('click', function (event) {
-        var favorite = event.target.closest('[data-favorite]');
-        if (favorite) { event.preventDefault(); toggleStored(favorite, 'product_favorite'); return; }
-
-        var compare = event.target.closest('[data-compare]');
-        if (compare) { event.preventDefault(); toggleStored(compare, 'product_compare'); return; }
-
-        var quick = event.target.closest('[data-quick-view]');
-        if (quick) {
-            event.preventDefault();
-            var modal = document.querySelector('[data-quick-modal="' + quick.getAttribute('data-product-id') + '"]');
-            if (modal) { modal.removeAttribute('hidden'); document.body.style.overflow = 'hidden'; }
-            return;
-        }
-
-        var close = event.target.closest('[data-quick-close]');
-        if (close || event.target.matches('[data-quick-modal]')) {
-            var openModal = event.target.closest('[data-quick-modal]') || document.querySelector('[data-quick-modal]:not([hidden])');
-            if (openModal) { openModal.setAttribute('hidden', 'hidden'); document.body.style.overflow = ''; }
-        }
-    });
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key !== 'Escape') return;
-        document.querySelectorAll('[data-quick-modal]:not([hidden])').forEach(function (modal) {
-            modal.setAttribute('hidden', 'hidden');
-            document.body.style.overflow = '';
-        });
-    });
-});
-</script>
-@endpush
 @endonce
 
-<article class="product-card" data-product-card data-product-id="{{ $product->id }}">
+<article class="product-card"
+         data-product-card
+         data-product-id="{{ $product->id }}"
+         data-product-url="{{ $product->url }}"
+         onclick="if (!event.target.closest('a,button')) window.location.href=this.dataset.productUrl">
     <a href="{{ $product->url }}" class="product-card__media card-img-wrap">
         @if($image)
         <picture>
@@ -165,20 +103,10 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
         @endif
 
-        <span class="product-card__stock">{{ ($product->in_stock ?? true) ? 'В наличии' : 'Нет в наличии' }}</span>
+        <span class="product-card__stock {{ ($product->in_stock ?? true) ? '' : 'product-card__stock--out' }}">
+            {{ ($product->in_stock ?? true) ? 'В наличии' : 'Нет в наличии' }}
+        </span>
     </a>
-
-    <div class="product-card__tools">
-        <button type="button" class="product-card__icon" data-favorite data-product-id="{{ $product->id }}" aria-label="Добавить в избранное">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
-        </button>
-        <button type="button" class="product-card__icon" data-compare data-product-id="{{ $product->id }}" aria-label="Добавить к сравнению">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01"/></svg>
-        </button>
-    </div>
-    <button type="button" class="product-card__quick" data-quick-view data-product-id="{{ $product->id }}" aria-label="Быстрый просмотр">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg>
-    </button>
 
     <div class="product-card__body product-card-body">
         @if(!empty($product->brand))
@@ -198,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
             @if(!empty($product->sku))
             <a href="{{ $product->url }}" class="product-card__kaspi product-card-button">Kaspi</a>
             @else
-            <a href="{{ $product->url }}" class="product-card__kaspi product-card-button" style="background:#111">Подробнее</a>
+            <a href="{{ $product->url }}" class="product-card__kaspi product-card-button" style="background:#111;color:#fff;border-color:#111">Подробнее</a>
             @endif
             @if($wa)
             <a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener" class="product-card__wa" aria-label="Купить в WhatsApp">
@@ -207,26 +135,4 @@ document.addEventListener('DOMContentLoaded', function () {
             @endif
         </div>
     </div>
-
 </article>
-
-<div class="product-quick" data-quick-modal="{{ $product->id }}" hidden>
-    <div class="product-quick__box">
-        <button type="button" class="product-quick__close" data-quick-close aria-label="Закрыть">×</button>
-        <div class="product-quick__image">
-            <img src="{{ $thumb }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="320" height="320">
-        </div>
-        <div style="padding:8px 4px 4px">
-            @if(!empty($product->brand))<div class="product-card__brand">{{ $product->brand->name }}</div>@endif
-            <h3 style="font-size:22px;line-height:1.25;margin:0 0 12px;color:#111">{{ $product->name }}</h3>
-            <div class="product-card__price" style="margin-bottom:16px"><strong>{{ number_format($product->price, 0, '.', ' ') }} ₸</strong></div>
-            @if(!empty($product->short_description))
-            <p style="font-size:14px;color:#666;line-height:1.6;margin-bottom:18px">{{ \Illuminate\Support\Str::limit(strip_tags($product->short_description), 180) }}</p>
-            @endif
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <a href="{{ $product->url }}" class="btn-orange-sm">Подробнее</a>
-                @if($wa)<a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener" class="btn-wa-sm" style="width:auto;padding-left:16px;padding-right:16px">WhatsApp</a>@endif
-            </div>
-        </div>
-    </div>
-</div>

@@ -139,11 +139,16 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-lightbox-thumb.is-active{border-color:#ff8a00;box-shadow:0 0 0 2px rgba(255,138,0,.28)}
 .prod-lightbox-thumb img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
 @media(max-width:640px){
-    .prod-img-box{min-height:0;aspect-ratio:1/1;border-radius:16px}
+    .product-detail-container{padding-left:12px!important;padding-right:12px!important;padding-bottom:76px!important}
     .product-page-grid{gap:18px}
-    .prod-thumbs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;padding-bottom:6px}
-    .prod-thumb{width:62px;height:62px;flex-basis:62px}
-    .prod-gallery-arrow{width:38px;height:38px}
+    .product-gallery,.product-summary{min-width:0;width:100%;max-width:100%}
+    .prod-img-box{height:min(112vw,520px);min-height:360px;max-height:65vh;aspect-ratio:auto;border-radius:16px;box-shadow:0 10px 24px rgba(17,17,17,.06)}
+    .prod-main-photo-btn img{padding:14px}
+    .prod-photo-count{top:8px;right:8px;font-size:11px;padding:3px 8px}
+    .prod-thumbs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;gap:8px;margin-top:10px;padding:0 74px 14px 0;scrollbar-width:none}
+    .prod-thumbs::-webkit-scrollbar{display:none}
+    .prod-thumb{width:68px;height:68px;flex:0 0 68px;border-radius:10px}
+    .prod-gallery-arrow{width:34px;height:34px;background:rgba(255,255,255,.8);box-shadow:0 4px 12px rgba(0,0,0,.12)}
     .prod-gallery-arrow--prev{left:8px}
     .prod-gallery-arrow--next{right:8px}
     .prod-lightbox{padding:12px}
@@ -156,6 +161,18 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
     .prod-lightbox-count{top:12px;font-size:12px}
     .prod-lightbox-thumbs{max-width:94vw}
     .prod-lightbox-thumb{width:58px;height:58px;flex-basis:58px}
+    .product-summary>a:first-child{font-size:13px!important;line-height:1.2;margin-bottom:8px!important}
+    .product-summary h1{font-size:26px!important;line-height:1.15!important;margin-bottom:12px!important;overflow:visible!important;word-break:normal;overflow-wrap:anywhere}
+    .product-price-row{gap:8px!important;margin-bottom:10px!important;flex-wrap:wrap}
+    .product-price-main{font-size:34px!important;line-height:1.05;white-space:nowrap}
+    .product-price-old{font-size:14px!important}
+    .product-stock-row{font-size:13px!important;margin-bottom:6px!important}
+    .product-sku-row{font-size:12px!important;margin-bottom:14px!important}
+    .product-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-bottom:12px}
+    .product-info-card{padding:8px!important;gap:6px!important;align-items:flex-start!important}
+    .product-info-card span{font-size:16px!important;line-height:1}
+    .product-info-card div div:first-child{font-size:10.5px!important;line-height:1.25}
+    .product-info-card div div:last-child{font-size:10.5px!important;line-height:1.25}
 }
 
 .product-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;margin-bottom:24px}
@@ -163,9 +180,16 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .kaspi-button-wrap{display:flex;align-items:center;min-height:50px}
 .kaspi-button-wrap .ks-widget{display:inline-flex}
 @media(max-width:640px){
-    .product-actions{flex-direction:column;align-items:stretch}
+    .product-actions{flex-direction:column;align-items:stretch;gap:10px;margin-top:12px;margin-bottom:18px}
     .product-actions>*{width:100%}
-    .product-actions>a{justify-content:center}
+    .product-actions>a{justify-content:center;min-height:46px!important;font-size:14px!important;padding:12px!important}
+    .kaspi-button-wrap{min-height:44px;overflow:hidden}
+    .kaspi-button-wrap .ks-widget{max-width:100%}
+}
+@media(max-width:390px){
+    .prod-img-box{height:430px;min-height:340px}
+    .product-price-main{font-size:32px!important}
+    .product-info-grid{grid-template-columns:1fr!important}
 }
 </style>
 @php $wa=\App\Services\CacheService::setting('whatsapp','');
@@ -603,23 +627,23 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
       <div style="margin-bottom:12px"><span class="badge badge-hit" style="font-size:12px;padding:3px 10px">Хит продаж</span></div>
       @endif
 
-      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px">
-        <span style="font-size:2rem;font-weight:800;color:#111">{{ number_format($product->price,0,'.',' ') }} ₸</span>
+      <div class="product-price-row" style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px">
+        <span class="product-price-main" style="font-size:2rem;font-weight:800;color:#111">{{ number_format($product->price,0,'.',' ') }} ₸</span>
         @if($productHasDiscount)
-        <span style="font-size:16px;color:#aaa;text-decoration:line-through">{{ number_format($product->old_price,0,'.',' ') }} ₸</span>
+        <span class="product-price-old" style="font-size:16px;color:#aaa;text-decoration:line-through">{{ number_format($product->old_price,0,'.',' ') }} ₸</span>
         @endif
       </div>
 
       @if($product->in_stock)
-      <div style="display:flex;align-items:center;gap:6px;font-size:14px;color:#16a34a;margin-bottom:8px">
+      <div class="product-stock-row" style="display:flex;align-items:center;gap:6px;font-size:14px;color:#16a34a;margin-bottom:8px">
         <div style="width:8px;height:8px;background:#22c55e;border-radius:50%"></div> В наличии
       </div>
       @else
-      <div style="font-size:14px;color:#aaa;margin-bottom:8px">Нет в наличии</div>
+      <div class="product-stock-row" style="font-size:14px;color:#aaa;margin-bottom:8px">Нет в наличии</div>
       @endif
 
       @if($product->sku)
-      <div style="font-size:13px;color:#999;margin-bottom:20px">Артикул: {{ $product->sku }}</div>
+      <div class="product-sku-row" style="font-size:13px;color:#999;margin-bottom:20px">Артикул: {{ $product->sku }}</div>
       @endif
 
       <div class="product-actions">
@@ -645,9 +669,9 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
         @endif
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="product-info-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         @foreach([['🚚','Доставка по Алматы','1–2 дня'],['🏅','Гарантия','от 12 месяцев'],['↩️','Возврат','14 дней'],['💳','Оплата','Kaspi, карта, нал']] as [$icon,$t,$d])
-        <div style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8f8f8;border-radius:10px">
+        <div class="product-info-card" style="display:flex;align-items:center;gap:8px;padding:10px;background:#f8f8f8;border-radius:10px">
           <span style="font-size:18px">{{ $icon }}</span>
           <div>
             <div style="font-size:11px;font-weight:600;color:#111">{{ $t }}</div>

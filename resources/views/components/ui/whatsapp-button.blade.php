@@ -1,6 +1,7 @@
 @php $whatsapp = \App\Services\CacheService::setting('whatsapp', ''); @endphp
 @if($whatsapp)
 <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener"
+   class="floating-whatsapp"
    style="position:fixed;bottom:24px;right:24px;z-index:999;
           display:flex;align-items:center;justify-content:center;
           width:56px;height:56px;background:#22c55e;border-radius:50%;
@@ -14,4 +15,10 @@
         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 1.9.524 3.675 1.438 5.193L2 22l4.807-1.438A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zM4 12a8 8 0 1114.93 4.065l.07.13-1.016 3.043-3.043-1.016-.13-.07A8 8 0 014 12z"/>
     </svg>
 </a>
+<style>
+@media(max-width:640px){
+    .floating-whatsapp{width:56px!important;height:56px!important;right:18px!important;bottom:18px!important;z-index:998!important}
+    .floating-whatsapp svg{width:26px;height:26px}
+}
+</style>
 @endif
