@@ -1,7 +1,12 @@
 @extends('layouts.app')
 @section('title',$product->seoTitle())
 @section('description',$product->seoDescription())
-@section('canonical')<link rel="canonical" href="{{ $product->url }}">@endsection
+@section('canonical')
+<link rel="canonical" href="{{ $product->url }}">
+@if($product->main_image || $product->main_image_webp)
+<link rel="preload" as="image" href="{{ asset('storage/' . ($product->main_image_webp ?: $product->main_image)) }}" fetchpriority="high">
+@endif
+@endsection
 
 @section('schema')
 @php
@@ -46,9 +51,10 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 @endphp
 <style>
 .prod-img-box{
-    background:#f8f8f8;border-radius:16px;overflow:hidden;
+    background:#f8f8f8;border-radius:20px;overflow:hidden;
     border:1px solid #eee;position:relative;margin-bottom:12px;
-    max-height:340px;aspect-ratio:1;cursor:zoom-in;
+    min-height:320px;aspect-ratio:1/1;cursor:zoom-in;
+    box-shadow:0 16px 42px rgba(17,17,17,.07);
 }
 /* Кнопка-обёртка галереи — поверх всего, без pointer-events конфликтов */
 .prod-img-btn{
@@ -56,7 +62,10 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
     background:none;border:none;padding:0;cursor:zoom-in;
     position:absolute;inset:0;z-index:2;
 }
-@media(min-width:768px){.prod-img-box{max-height:none}}
+@media(min-width:768px){
+    .product-page-grid{grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);align-items:start}
+    .prod-img-box{min-height:520px;aspect-ratio:4/3}
+}
 
 /* HTML-описание товара */
 .product-content{max-width:900px;color:#444;line-height:1.8;font-size:15px}
@@ -92,15 +101,19 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 /* ── Product gallery clickable fix ── */
 .prod-main-photo-btn{position:absolute;inset:0;z-index:2;width:100%;height:100%;border:0;background:transparent;padding:0;cursor:zoom-in;display:block}
 .prod-main-photo-btn picture,.prod-main-photo-btn img{display:block;width:100%;height:100%}
-.prod-main-photo-btn img{pointer-events:none}
+.prod-main-photo-btn img{pointer-events:none;transition:opacity .18s ease,transform .32s ease;will-change:opacity,transform}
+.prod-img-box:hover [data-main-image]{transform:scale(1.045)}
+.prod-img-box.is-zoomed [data-main-image]{transform:scale(1.75)}
+.prod-img-box.is-switching [data-main-image]{opacity:.18;transform:scale(.985)}
 .prod-photo-count{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.56);color:#fff;font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;pointer-events:none;z-index:5;line-height:1.35;width:auto;max-width:max-content;white-space:nowrap}
 .prod-gallery-arrow{position:absolute;top:50%;z-index:4;transform:translateY(-50%);width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.9);color:#111;box-shadow:0 8px 20px rgba(0,0,0,.12);display:grid;place-items:center;cursor:pointer;transition:background .2s,transform .2s}
 .prod-gallery-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.04)}
 .prod-gallery-arrow--prev{left:12px}
 .prod-gallery-arrow--next{right:12px}
 .prod-gallery-arrow svg{width:18px;height:18px}
-.prod-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.prod-thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;background:#f8f8f8;border:2px solid transparent;cursor:pointer;padding:4px;transition:border-color .2s,box-shadow .2s;flex-shrink:0}
+.prod-thumbs{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.prod-thumb{width:72px;height:72px;border-radius:12px;overflow:hidden;background:#f8f8f8;border:2px solid transparent;cursor:pointer;padding:4px;transition:border-color .2s,box-shadow .2s,transform .2s;flex-shrink:0}
+.prod-thumb:hover{transform:translateY(-1px)}
 .prod-thumb.is-active{border-color:#ff8a00;box-shadow:0 0 0 2px #ff8a0033}
 .prod-thumb img{width:100%;height:100%;object-fit:contain;pointer-events:none}
 .prod-lightbox[hidden]{display:none!important}
@@ -121,6 +134,9 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-lightbox-thumb.is-active{border-color:#ff8a00;box-shadow:0 0 0 2px rgba(255,138,0,.28)}
 .prod-lightbox-thumb img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
 @media(max-width:640px){
+    .prod-img-box{min-height:0;aspect-ratio:1/1;border-radius:16px}
+    .prod-thumbs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;padding-bottom:6px}
+    .prod-thumb{width:62px;height:62px;flex-basis:62px}
     .prod-gallery-arrow{width:38px;height:38px}
     .prod-gallery-arrow--prev{left:8px}
     .prod-gallery-arrow--next{right:8px}
@@ -159,7 +175,41 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
     @php
     $allImages = [];
     $seenImagePaths = [];
-    $appendImage = function ($path, $alt = null, $webp = null) use (&$allImages, &$seenImagePaths, $product) {
+    $responsiveSrcset = function (?string $webpPath) {
+        $webpPath = ltrim(trim((string) $webpPath), '/');
+        if ($webpPath === '') {
+            return '';
+        }
+
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+        $directory = trim(dirname($webpPath), '.\\/');
+        $name = pathinfo($webpPath, PATHINFO_FILENAME);
+        $items = [];
+
+        foreach ([320, 640, 960, 1280, 1600] as $width) {
+            $variant = ($directory !== '' ? $directory . '/' : '') . "{$name}-{$width}.webp";
+            if ($disk->exists($variant)) {
+                $items[] = asset('storage/' . $variant) . " {$width}w";
+            }
+        }
+
+        return implode(', ', $items);
+    };
+    $thumbSrc = function (string $src, ?string $webpPath) {
+        $webpPath = ltrim(trim((string) $webpPath), '/');
+        if ($webpPath === '') {
+            return $src;
+        }
+
+        $directory = trim(dirname($webpPath), '.\\/');
+        $name = pathinfo($webpPath, PATHINFO_FILENAME);
+        $thumb = ($directory !== '' ? $directory . '/' : '') . "{$name}-thumb.webp";
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($thumb)
+            ? asset('storage/' . $thumb)
+            : $src;
+    };
+    $appendImage = function ($path, $alt = null, $webp = null) use (&$allImages, &$seenImagePaths, $product, $responsiveSrcset, $thumbSrc) {
         $normalizedPath = ltrim(trim((string) $path), '/');
         if ($normalizedPath === '' || isset($seenImagePaths[$normalizedPath])) {
             return;
@@ -167,9 +217,13 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
 
         $normalizedWebp = ltrim(trim((string) $webp), '/');
         $seenImagePaths[$normalizedPath] = true;
+        $src = asset('storage/'.$normalizedPath);
+        $webpSrc = $normalizedWebp !== '' ? asset('storage/'.$normalizedWebp) : '';
         $allImages[] = [
-            'src' => asset('storage/'.$normalizedPath),
-            'webp' => $normalizedWebp !== '' ? asset('storage/'.$normalizedWebp) : '',
+            'src' => $src,
+            'webp' => $webpSrc,
+            'srcset' => $responsiveSrcset($normalizedWebp),
+            'thumb' => $thumbSrc($src, $normalizedWebp),
             'alt' => $alt ?: $product->name,
         ];
     };
@@ -182,6 +236,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
     }
     $firstSrc = $allImages[0]['src'] ?? '';
     $firstWebp = $allImages[0]['webp'] ?? '';
+    $firstSrcset = $allImages[0]['srcset'] ?? '';
     @endphp
 
     <div class="product-gallery" data-product-gallery>
@@ -190,10 +245,12 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
         @if($firstSrc)
         <button type="button" class="prod-main-photo-btn" data-open-lightbox aria-label="Открыть фото">
           <picture>
-            <source data-main-source srcset="{{ $firstWebp }}" type="image/webp" @if(!$firstWebp) disabled @endif>
+            <source data-main-source srcset="{{ $firstSrcset ?: $firstWebp }}" type="image/webp" sizes="(max-width: 640px) 94vw, 58vw" @if(!$firstWebp) disabled @endif>
             <img data-main-image src="{{ $firstSrc }}"
                  alt="{{ $product->name }}"
                  style="width:100%;height:100%;object-fit:contain;padding:24px;display:block"
+                 width="960" height="720"
+                 decoding="async"
                  loading="eager" fetchpriority="high">
           </picture>
         </button>
@@ -229,13 +286,14 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
                 data-index="{{ $i }}"
                 data-src="{{ $img['src'] }}"
                 data-webp="{{ $img['webp'] }}"
+                data-srcset="{{ $img['srcset'] }}"
                 data-alt="{{ $img['alt'] }}"
                 aria-label="Показать фото {{ $i + 1 }}">
           <picture>
             @if($img['webp'])
             <source srcset="{{ $img['webp'] }}" type="image/webp">
             @endif
-            <img src="{{ $img['src'] }}" alt="{{ $img['alt'] }}" loading="lazy">
+            <img src="{{ $img['thumb'] }}" alt="{{ $img['alt'] }}" loading="lazy" decoding="async" width="160" height="160">
           </picture>
         </button>
         @endforeach
@@ -256,7 +314,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
         @endif
         <div class="prod-lightbox__stage" data-lightbox-stage>
           <div class="prod-lightbox__image-wrap">
-            <img class="prod-lightbox__image" data-lightbox-image src="{{ $firstSrc }}" alt="{{ $product->name }}">
+            <img class="prod-lightbox__image" data-lightbox-image src="{{ $firstSrc }}" alt="{{ $product->name }}" decoding="async">
           </div>
           @if(count($allImages) > 1)
           <div class="prod-lightbox-thumbs" data-lightbox-thumbs>
@@ -270,7 +328,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
                 @if($img['webp'])
                 <source srcset="{{ $img['webp'] }}" type="image/webp">
                 @endif
-                <img src="{{ $img['src'] }}" alt="{{ $img['alt'] }}" loading="lazy">
+                <img src="{{ $img['thumb'] }}" alt="{{ $img['alt'] }}" loading="lazy" decoding="async" width="160" height="160">
               </picture>
             </button>
             @endforeach
@@ -285,6 +343,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
         document.querySelectorAll('[data-product-gallery]').forEach(function (gallery) {
             var mainImage = gallery.querySelector('[data-main-image]');
             var mainSource = gallery.querySelector('[data-main-source]');
+            var imageBox = gallery.querySelector('.prod-img-box');
             var mainButton = gallery.querySelector('[data-open-lightbox]');
             var lightbox = gallery.querySelector('[data-lightbox]');
             var lightboxStage = gallery.querySelector('[data-lightbox-stage]');
@@ -302,6 +361,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
                 return {
                     src: btn.getAttribute('data-src'),
                     webp: btn.getAttribute('data-webp'),
+                    srcset: btn.getAttribute('data-srcset'),
                     alt: btn.getAttribute('data-alt') || ''
                 };
             });
@@ -320,12 +380,19 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
 
                 activeIndex = index;
                 activeSrc = src;
+                if (imageBox) {
+                    imageBox.classList.remove('is-zoomed');
+                    imageBox.classList.add('is-switching');
+                    window.setTimeout(function () {
+                        imageBox.classList.remove('is-switching');
+                    }, 180);
+                }
                 mainImage.setAttribute('src', src);
                 if (alt) mainImage.setAttribute('alt', alt);
 
                 if (mainSource) {
                     if (image.webp) {
-                        mainSource.setAttribute('srcset', image.webp);
+                        mainSource.setAttribute('srcset', image.srcset || image.webp);
                         mainSource.removeAttribute('disabled');
                     } else {
                         mainSource.removeAttribute('srcset');
@@ -440,7 +507,12 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
             });
 
             var touchStartX = null;
+            var lastTapAt = 0;
             if (mainButton) {
+                mainButton.addEventListener('dblclick', function (e) {
+                    e.preventDefault();
+                    if (imageBox) imageBox.classList.toggle('is-zoomed');
+                });
                 mainButton.addEventListener('touchstart', function (e) {
                     touchStartX = e.changedTouches[0].clientX;
                 }, { passive: true });
@@ -448,6 +520,16 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
                     if (touchStartX === null) return;
                     var delta = e.changedTouches[0].clientX - touchStartX;
                     touchStartX = null;
+                    var now = Date.now();
+                    if (Math.abs(delta) < 12 && now - lastTapAt < 320) {
+                        e.preventDefault();
+                        if (imageBox) imageBox.classList.toggle('is-zoomed');
+                        lastTapAt = 0;
+                        return;
+                    }
+                    if (Math.abs(delta) < 12) {
+                        lastTapAt = now;
+                    }
                     if (Math.abs(delta) < 40) return;
                     e.preventDefault();
                     shiftImage(delta > 0 ? -1 : 1);

@@ -15,6 +15,8 @@ class OptimizeProductImagesCommand extends Command
 
     private const QUALITY = 82;
     private const MAX_WIDTH = 1600;
+    private const RESPONSIVE_WIDTHS = [320, 640, 960, 1280, 1600];
+    private const THUMB_WIDTH = 160;
 
     public function handle(): int
     {
@@ -45,16 +47,36 @@ class OptimizeProductImagesCommand extends Command
 
             $targetPath = $record['webp_path'] ?: $this->webpPath($sourcePath);
             $absoluteTarget = Storage::disk('public')->path($targetPath);
+            $targetExists = Storage::disk('public')->exists($targetPath);
+            $needsVariants = $this->hasMissingVariants($targetPath);
 
-            if (! $force && Storage::disk('public')->exists($targetPath)) {
+            if (! $force && $targetExists && ! $needsVariants) {
                 $skipped++;
                 continue;
             }
 
-            $newBytes = $this->makeWebp($absoluteSource, $absoluteTarget, $dryRun);
-            if ($newBytes === null) {
-                $skipped++;
-                continue;
+            if (! $force && $targetExists) {
+                $newBytes = filesize($absoluteTarget) ?: 0;
+            } else {
+                $newBytes = $this->makeWebp($absoluteSource, $absoluteTarget, $dryRun, self::MAX_WIDTH);
+                if ($newBytes === null) {
+                    $skipped++;
+                    continue;
+                }
+            }
+
+            foreach (self::RESPONSIVE_WIDTHS as $width) {
+                $variantPath = $this->variantPath($targetPath, $width);
+                if (! $force && Storage::disk('public')->exists($variantPath)) {
+                    continue;
+                }
+
+                $this->makeWebp($absoluteSource, Storage::disk('public')->path($variantPath), $dryRun, $width);
+            }
+
+            $thumbPath = $this->variantPath($targetPath, self::THUMB_WIDTH, 'thumb');
+            if ($force || ! Storage::disk('public')->exists($thumbPath)) {
+                $this->makeWebp($absoluteSource, Storage::disk('public')->path($thumbPath), $dryRun, self::THUMB_WIDTH);
             }
 
             $processed++;
@@ -112,7 +134,7 @@ class OptimizeProductImagesCommand extends Command
         }
     }
 
-    private function makeWebp(string $source, string $target, bool $dryRun): ?int
+    private function makeWebp(string $source, string $target, bool $dryRun, int $maxWidth): ?int
     {
         $extension = strtolower(pathinfo($source, PATHINFO_EXTENSION));
 
@@ -124,8 +146,8 @@ class OptimizeProductImagesCommand extends Command
                 } elseif (method_exists($image, 'autoOrientImage')) {
                     $image->autoOrientImage();
                 }
-                if ($image->getImageWidth() > self::MAX_WIDTH) {
-                    $image->resizeImage(self::MAX_WIDTH, 0, \Imagick::FILTER_LANCZOS, 1);
+                if ($image->getImageWidth() > $maxWidth) {
+                    $image->resizeImage($maxWidth, 0, \Imagick::FILTER_LANCZOS, 1);
                 }
                 $image->setImageFormat('webp');
                 $image->setImageCompressionQuality(self::QUALITY);
@@ -162,8 +184,8 @@ class OptimizeProductImagesCommand extends Command
         $height = imagesy($sourceImage);
         $targetImage = $sourceImage;
 
-        if ($width > self::MAX_WIDTH) {
-            $newWidth = self::MAX_WIDTH;
+        if ($width > $maxWidth) {
+            $newWidth = $maxWidth;
             $newHeight = (int) round($height * ($newWidth / $width));
             $targetImage = imagecreatetruecolor($newWidth, $newHeight);
             imagealphablending($targetImage, false);
@@ -198,6 +220,27 @@ class OptimizeProductImagesCommand extends Command
         $filename = pathinfo($sourcePath, PATHINFO_FILENAME) . '.webp';
 
         return ($directory !== '' ? $directory . '/' : '') . $filename;
+    }
+
+    private function variantPath(string $webpPath, int $width, ?string $suffix = null): string
+    {
+        $directory = trim(dirname($webpPath), '.\\/');
+        $name = pathinfo($webpPath, PATHINFO_FILENAME);
+        $variantSuffix = $suffix ?: (string) $width;
+        $filename = "{$name}-{$variantSuffix}.webp";
+
+        return ($directory !== '' ? $directory . '/' : '') . $filename;
+    }
+
+    private function hasMissingVariants(string $webpPath): bool
+    {
+        foreach (self::RESPONSIVE_WIDTHS as $width) {
+            if (! Storage::disk('public')->exists($this->variantPath($webpPath, $width))) {
+                return true;
+            }
+        }
+
+        return ! Storage::disk('public')->exists($this->variantPath($webpPath, self::THUMB_WIDTH, 'thumb'));
     }
 
     private function ensureDirectory(string $path): void
