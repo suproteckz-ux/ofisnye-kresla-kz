@@ -46,29 +46,28 @@ if ($webp !== '') {
 
 @once
 <style>
-.product-card{position:relative;background:#fff;border-radius:18px;border:1px solid #ececec;overflow:hidden;display:flex;flex-direction:column;height:100%;box-shadow:0 8px 24px rgba(17,17,17,.04);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
-.product-card:hover{transform:translateY(-4px);border-color:#ffe0b5;box-shadow:0 18px 42px rgba(17,17,17,.11)}
-.product-card__media{display:block;position:relative;background:#fbfbfb;overflow:hidden;flex-shrink:0;height:220px}
-.product-card__media img{width:100%;height:100%;object-fit:contain;padding:16px;position:absolute;inset:0;transition:transform .28s ease}
-.product-card:hover .product-card__media img{transform:scale(1.045)}
+.product-card{position:relative;background:#fff;border-radius:16px;border:1px solid #ececec;overflow:hidden;display:flex;flex-direction:column;height:100%;box-shadow:0 6px 18px rgba(17,17,17,.035);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.product-card:hover{transform:translateY(-3px);border-color:#f3d4aa;box-shadow:0 14px 34px rgba(17,17,17,.09)}
+.product-card__media{display:block;position:relative;background:#fafafa;overflow:hidden;flex-shrink:0;height:180px!important}
+.product-card__media img{width:100%;height:100%;object-fit:contain;padding:14px;position:absolute;inset:0;transition:transform .28s ease}
+.product-card:hover .product-card__media img{transform:scale(1.035)}
 .product-card__badges{position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:5px;z-index:2}
 .product-card__badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;color:#fff}
 .product-card__badge--new{background:#14b8a6}.product-card__badge--hit{background:#8b5cf6}.product-card__badge--sale{background:#ff5a1f}
-.product-card__tools{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:7px;z-index:3}
-.product-card__icon{width:34px;height:34px;border:1px solid #e8e8e8;border-radius:50%;background:rgba(255,255,255,.92);color:#64748b;display:grid;place-items:center;cursor:pointer;transition:color .18s,border-color .18s,background .18s}
+.product-card__tools{position:absolute;top:9px;right:9px;display:flex;flex-direction:column;gap:6px;z-index:3}
+.product-card__icon{width:30px;height:30px;border:1px solid #e8e8e8;border-radius:50%;background:rgba(255,255,255,.9);color:#64748b;display:grid;place-items:center;cursor:pointer;transition:color .18s,border-color .18s,background .18s}
 .product-card__icon:hover,.product-card__icon.is-active{color:#ff8a00;border-color:#ff8a00;background:#fff7ed}
-.product-card__quick{position:absolute;right:10px;top:172px;z-index:3;width:38px;height:38px;border:0;border-radius:50%;background:rgba(17,17,17,.58);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .18s,transform .18s}
+.product-card__quick{position:absolute;right:10px;top:136px;z-index:3;width:34px;height:34px;border:0;border-radius:50%;background:rgba(17,17,17,.46);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .18s,transform .18s}
 .product-card__quick:hover{background:#111;transform:scale(1.04)}
-.product-card__stock{position:absolute;left:10px;bottom:10px;z-index:2;font-size:10px;font-weight:700;padding:4px 9px;background:#dcfce7;color:#16a34a;border-radius:999px}
+.product-card__stock{position:absolute;left:10px;bottom:10px;z-index:2;font-size:10px;font-weight:700;padding:3px 8px;background:#eafaf0;color:#16a34a;border-radius:999px}
 .product-card__body{padding:16px;display:flex;flex-direction:column;flex:1;min-width:0}
 .product-card__brand{font-size:11px;color:#d97706;font-weight:800;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase}
 .product-card__title{font-size:14px;font-weight:700;color:#111;line-height:1.38;margin-bottom:12px;min-height:39px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-decoration:none}
 .product-card__price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:13px}
 .product-card__price strong{font-size:18px;font-weight:900;color:#111}.product-card__price del{font-size:12px;color:#aaa}
 .product-card__actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:auto;align-items:center}
-.product-card__kaspi{display:flex;align-items:center;justify-content:center;min-height:38px;border-radius:10px;background:#ff4b32;color:#fff;font-size:12px;font-weight:850;text-decoration:none}
+.product-card__kaspi{display:flex;align-items:center;justify-content:center;min-height:36px;border:1px solid #ffd1c9;border-radius:10px;background:#fff5f2;color:#ef442f;font-size:12px;font-weight:850;text-decoration:none}
 .product-card__wa{width:38px;height:38px;border-radius:50%;background:#22c55e;color:#fff;display:grid;place-items:center;text-decoration:none}
-.product-card__details{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:34px;border-radius:9px;background:#f7f7f7;color:#444;font-size:12px;font-weight:700;text-decoration:none}
 .product-quick[hidden]{display:none!important}
 .product-quick{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.52);display:grid;place-items:center;padding:18px}
 .product-quick__box{width:min(720px,100%);background:#fff;border-radius:18px;box-shadow:0 28px 80px rgba(0,0,0,.28);display:grid;grid-template-columns:260px 1fr;gap:20px;padding:18px;position:relative}
@@ -76,7 +75,7 @@ if ($webp !== '') {
 .product-quick__image{background:#f8f8f8;border-radius:14px;aspect-ratio:1;display:grid;place-items:center;overflow:hidden}
 .product-quick__image img{width:100%;height:100%;object-fit:contain;padding:16px}
 @media(max-width:640px){
-  .product-card__media{height:170px}.product-card__quick{top:134px}.product-card__body{padding:12px}.product-card__title{font-size:12px;min-height:34px}.product-card__price strong{font-size:15px}
+  .product-card__media{height:150px!important}.product-card__quick{top:114px}.product-card__body{padding:12px}.product-card__title{font-size:12px;min-height:34px}.product-card__price strong{font-size:15px}
   .product-card__actions{grid-template-columns:1fr 36px}.product-card__kaspi{font-size:11px;min-height:36px}.product-card__wa{width:36px;height:36px}
   .product-quick__box{grid-template-columns:1fr;max-height:92vh;overflow:auto}.product-quick__image{max-height:280px}
 }
@@ -197,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         <div class="product-card__actions">
             @if(!empty($product->sku))
-            <a href="{{ $product->url }}" class="product-card__kaspi product-card-button">Kaspi рассрочка</a>
+            <a href="{{ $product->url }}" class="product-card__kaspi product-card-button">Kaspi</a>
             @else
             <a href="{{ $product->url }}" class="product-card__kaspi product-card-button" style="background:#111">Подробнее</a>
             @endif
@@ -206,7 +205,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
             </a>
             @endif
-            <a href="{{ $product->url }}" class="product-card__details">Открыть товар</a>
         </div>
     </div>
 

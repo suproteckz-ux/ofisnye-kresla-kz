@@ -53,7 +53,7 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-img-box{
     background:#f8f8f8;border-radius:20px;overflow:hidden;
     border:1px solid #eee;position:relative;margin-bottom:12px;
-    min-height:320px;aspect-ratio:1/1;cursor:zoom-in;
+    width:100%;max-width:100%;min-height:320px;max-height:620px;aspect-ratio:1/1;cursor:zoom-in;
     box-shadow:0 16px 42px rgba(17,17,17,.07);
 }
 /* Кнопка-обёртка галереи — поверх всего, без pointer-events конфликтов */
@@ -63,8 +63,13 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
     position:absolute;inset:0;z-index:2;
 }
 @media(min-width:768px){
-    .product-page-grid{grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);align-items:start}
-    .prod-img-box{min-height:520px;aspect-ratio:4/3}
+    .product-detail-container{max-width:1200px}
+    .product-page-grid{grid-template-columns:minmax(0,1fr) minmax(360px,520px);gap:48px;align-items:start}
+    .product-page-grid>*{min-width:0}
+    .product-gallery{width:100%;max-width:100%;min-width:0}
+    .product-summary{min-width:0;max-width:520px}
+    .product-summary h1{overflow:visible;text-overflow:clip;word-break:normal;overflow-wrap:anywhere}
+    .prod-img-box{min-height:0;aspect-ratio:4/3}
 }
 
 /* HTML-описание товара */
@@ -135,6 +140,7 @@ try { if (method_exists($product,'hasDiscount')) { $productHasDiscount = (bool)$
 .prod-lightbox-thumb img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
 @media(max-width:640px){
     .prod-img-box{min-height:0;aspect-ratio:1/1;border-radius:16px}
+    .product-page-grid{gap:18px}
     .prod-thumbs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;padding-bottom:6px}
     .prod-thumb{width:62px;height:62px;flex-basis:62px}
     .prod-gallery-arrow{width:38px;height:38px}
@@ -168,7 +174,7 @@ $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->
 $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
 @endphp
 
-<div class="container" style="padding-top:24px;padding-bottom:48px">
+<div class="container product-detail-container" style="padding-top:24px;padding-bottom:48px">
   <div class="product-page-grid">
 
     {{-- ── ГАЛЕРЕЯ: без Alpine, на обычном JavaScript ── --}}
@@ -581,7 +587,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
     </script>
 
     {{-- ── ИНФОРМАЦИЯ ── --}}
-    <div>
+    <div class="product-summary">
       @if($product->brand)
       <a href="{{ route('brand.show',$product->brand->slug) }}"
          style="font-size:13px;font-weight:600;color:#ff8a00;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;display:inline-block">
