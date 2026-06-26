@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MarketRadarSyncLog extends Model
 {
+    protected $table = 'marketradar_sync_logs';
+
     protected $fillable = [
         'product_id',
         'sku',

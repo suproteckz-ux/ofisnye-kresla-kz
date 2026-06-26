@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Category;
+use App\Models\MarketRadarSyncLog;
 use App\Models\Product;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -203,47 +204,47 @@ class ProductResource extends Resource
                         ->label('SKU')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->sku ?? '')),
+                        ->default(fn (?Product $record): string => (string) ($record?->sku ?? '')),
                     TextInput::make('marketradar_last_status_view')
                         ->label('Последний статус')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('status') ?? 'нет')),
+                        ->formatStateUsing(fn (?Product $record): string => (string) (static::latestMarketRadarLog($record)?->status ?? 'Нет данных')),
                     TextInput::make('marketradar_last_sync_view')
                         ->label('Последняя синхронизация')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => static::latestMarketRadarDate($record, 'Y-m-d H:i') ?: 'нет'),
+                        ->formatStateUsing(fn (?Product $record): string => static::latestMarketRadarDate($record, 'Y-m-d H:i') ?: 'Нет данных'),
                     TextInput::make('marketradar_matched_by_view')
                         ->label('matched_by')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('matched_by') ?? '')),
+                        ->formatStateUsing(fn (?Product $record): string => (string) (static::latestMarketRadarLog($record)?->matched_by ?? 'Нет данных')),
                     TextInput::make('marketradar_xml_price_view')
                         ->label('Цена XML')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('new_price') ?? '')),
+                        ->formatStateUsing(fn (?Product $record): string => (string) (static::latestMarketRadarLog($record)?->new_price ?? 'Нет данных')),
                     TextInput::make('marketradar_xml_quantity_view')
                         ->label('Остаток XML')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('new_quantity') ?? '')),
+                        ->formatStateUsing(fn (?Product $record): string => (string) (static::latestMarketRadarLog($record)?->new_quantity ?? 'Нет данных')),
                     TextInput::make('marketradar_xml_photos_view')
                         ->label('Фото XML')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('photos_found') ?? '0')),
+                        ->formatStateUsing(fn (?Product $record): string => (string) (static::latestMarketRadarLog($record)?->photos_found ?? 'Нет данных')),
                     TextInput::make('marketradar_saved_photos_view')
                         ->label('Фото загружено')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('photos_saved') ?? '0')),
+                        ->formatStateUsing(fn (?Product $record): string => (string) (static::latestMarketRadarLog($record)?->photos_saved ?? 'Нет данных')),
                     TextInput::make('marketradar_error_view')
                         ->label('Ошибка')
                         ->disabled()
                         ->dehydrated(false)
-                        ->formatStateUsing(fn (?Product $record): string => Str::limit((string) ($record?->marketradarSyncLogs()->latest()->value('error_message') ?? ''), 180)),
+                        ->formatStateUsing(fn (?Product $record): string => Str::limit((string) (static::latestMarketRadarLog($record)?->error_message ?? 'Нет данных'), 180)),
                 ])
                 ->collapsed(),
 
@@ -343,7 +344,7 @@ class ProductResource extends Resource
 
                 TextColumn::make('marketradar_status')
                     ->label('MarketRadar')
-                    ->state(fn (Product $r): string => (string) ($r->marketradarSyncLogs()->latest()->value('status') ?? 'нет'))
+                    ->state(fn (Product $r): string => (string) (static::latestMarketRadarLog($r)?->status ?? 'Нет данных'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'price_updated', 'stock_updated', 'photos_updated', 'matched' => 'success',
@@ -355,7 +356,7 @@ class ProductResource extends Resource
 
                 TextColumn::make('marketradar_last_sync')
                     ->label('MR sync')
-                    ->state(fn (Product $r): string => static::latestMarketRadarDate($r, null) ?: '—')
+                    ->state(fn (Product $r): string => static::latestMarketRadarDate($r, null) ?: 'Нет данных')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 // Бренд — скрыт по умолчанию
@@ -576,7 +577,7 @@ class ProductResource extends Resource
 
     private static function latestMarketRadarDate(?Product $record, ?string $format): ?string
     {
-        $value = $record?->marketradarSyncLogs()->latest()->value('created_at');
+        $value = static::latestMarketRadarLog($record)?->created_at;
         if (! $value) {
             return null;
         }
@@ -588,5 +589,14 @@ class ProductResource extends Resource
         }
 
         return $format ? $date->format($format) : $date->diffForHumans();
+    }
+
+    private static function latestMarketRadarLog(?Product $record): ?MarketRadarSyncLog
+    {
+        if (! $record?->exists) {
+            return null;
+        }
+
+        return $record->marketradarSyncLogs()->latest()->first();
     }
 }
