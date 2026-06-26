@@ -26,7 +26,7 @@
                 <h1>Контакты шоурума офисных кресел в Алматы</h1>
                 <p>Приходите в шоурум, чтобы протестировать кресла, сравнить модели и выбрать удобный вариант для дома или офиса.</p>
                 <div class="contacts-actions">
-                    <a href="https://wa.me/{{ $cleanWhatsapp }}?text={{ $waText }}" target="_blank" rel="noopener" class="contacts-btn contacts-btn--wa">
+                    <a href="https://wa.me/{{ $cleanWhatsapp }}?text={{ $waText }}" target="_blank" rel="noopener" class="contacts-btn contacts-btn--wa" data-analytics-location="contacts">
                         WhatsApp
                     </a>
                     <a href="{{ $routeUrl }}" target="_blank" rel="noopener" class="contacts-btn contacts-btn--route">
@@ -43,7 +43,7 @@
                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg>
                         </span>
                         <div>
-                            <strong><a href="tel:{{ $cleanPhone }}">{{ $phone }}</a></strong>
+                            <strong><a href="tel:{{ $cleanPhone }}" data-analytics-location="contacts" data-phone="{{ $cleanPhone }}">{{ $phone }}</a></strong>
                             <small>WhatsApp, звонки</small>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 <div class="showroom-card__actions">
-                    <a href="https://wa.me/{{ $cleanWhatsapp }}?text={{ $waText }}" target="_blank" rel="noopener" class="contacts-btn contacts-btn--wa">WhatsApp</a>
+                    <a href="https://wa.me/{{ $cleanWhatsapp }}?text={{ $waText }}" target="_blank" rel="noopener" class="contacts-btn contacts-btn--wa" data-analytics-location="contacts">WhatsApp</a>
                     <a href="{{ $routeUrl }}" target="_blank" rel="noopener" class="contacts-btn contacts-btn--route">Построить маршрут</a>
                 </div>
             </aside>

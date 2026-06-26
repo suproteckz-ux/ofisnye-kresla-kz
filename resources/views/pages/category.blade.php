@@ -96,6 +96,22 @@ if ($faqItems->isNotEmpty()) {
 @endif
 @endsection
 
+@if(isset($products) && $products->count())
+@push('scripts')
+<x-analytics.event
+    once-key="view_item_list:category_{{ $category->slug }}:{{ request()->fullUrl() }}"
+    :payload="[
+        'event' => 'view_item_list',
+        'ecommerce' => [
+            'item_list_id' => 'category_' . $category->slug,
+            'item_list_name' => $category->name,
+            'items' => \App\Support\Analytics::productItems($products->getCollection()),
+        ],
+    ]"
+/>
+@endpush
+@endif
+
 @section('breadcrumbs')
 <div class="container" style="padding-top:14px">
     <nav aria-label="Хлебные крошки" style="font-size:13px;color:#888">
@@ -156,8 +172,13 @@ if ($faqItems->isNotEmpty()) {
     {{-- Товары --}}
     @if($products->count())
     <div class="pgrid">
-        @foreach($products as $product)
-            @include('components.product.card', ['product'=>$product])
+        @foreach($products as $index => $product)
+            @include('components.product.card', [
+                'product' => $product,
+                'itemListId' => 'category_' . $category->slug,
+                'itemListName' => $category->name,
+                'itemIndex' => (($products->currentPage() - 1) * $products->perPage()) + $index + 1,
+            ])
         @endforeach
     </div>
     <div style="margin-top:32px;display:flex;justify-content:center">{{ $products->links() }}</div>

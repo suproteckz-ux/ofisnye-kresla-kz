@@ -198,6 +198,33 @@ $waMsg=urlencode('Хочу заказать: '.$product->name.' — '.$product->
 $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
 @endphp
 
+@push('scripts')
+<x-analytics.event
+    once-key="view_item:{{ $product->id }}:{{ request()->fullUrl() }}"
+    :payload="[
+        'event' => 'view_item',
+        'ecommerce' => [
+            'currency' => 'KZT',
+            'value' => (float) $product->price,
+            'items' => [\App\Support\Analytics::productItem($product)],
+        ],
+    ]"
+/>
+@if(($similar ?? collect())->count())
+<x-analytics.event
+    once-key="view_item_list:similar_products:{{ $product->id }}"
+    :payload="[
+        'event' => 'view_item_list',
+        'ecommerce' => [
+            'item_list_id' => 'similar_products',
+            'item_list_name' => 'Похожие товары',
+            'items' => \App\Support\Analytics::productItems(($similar ?? collect())->take(4)),
+        ],
+    ]"
+/>
+@endif
+@endpush
+
 <div class="container product-detail-container" style="padding-top:24px;padding-bottom:48px">
   <div class="product-page-grid">
 
@@ -649,11 +676,17 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
       <div class="product-actions">
         @if($wa)
         <a href="https://wa.me/{{ $wa }}?text={{ $waMsg }}" target="_blank" rel="noopener"
+           data-analytics-location="product_page"
+           data-product-sku="{{ $product->sku }}"
+           data-product-name="{{ $product->name }}"
            class="btn-wa" style="justify-content:center;font-size:16px;padding:15px">
           <svg class="wa-svg" style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
           Купить в WhatsApp
         </a>
         <a href="https://wa.me/{{ $wa }}" target="_blank" rel="noopener"
+           data-analytics-location="product_page"
+           data-product-sku="{{ $product->sku }}"
+           data-product-name="{{ $product->name }}"
            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;
                   border:1.5px solid #eee;border-radius:10px;font-size:14px;font-weight:500;
                   color:#333;transition:border-color .2s"
@@ -743,8 +776,13 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
   <div>
     <h2 style="font-size:20px;font-weight:700;color:#111;margin-bottom:20px">Похожие товары</h2>
     <div class="pgrid">
-      @foreach($similar->take(4) as $p)
-        @include('components.product.card', ['product' => $p])
+      @foreach($similar->take(4) as $index => $p)
+        @include('components.product.card', [
+          'product' => $p,
+          'itemListId' => 'similar_products',
+          'itemListName' => 'Похожие товары',
+          'itemIndex' => $index + 1,
+        ])
       @endforeach
     </div>
   </div>
@@ -756,7 +794,7 @@ $hasKaspiSku = trim((string) ($product->sku ?? '')) !== '';
   <p style="color:#fff;font-weight:700;font-size:18px;margin-bottom:8px">Нужна помощь с выбором?</p>
   <p style="color:#aaa;font-size:14px;margin-bottom:20px">Напишите нам в WhatsApp — подберём кресло под ваши задачи</p>
   @if($wa)
-  <a href="https://wa.me/{{ $wa }}" target="_blank" class="btn-wa">
+  <a href="https://wa.me/{{ $wa }}" target="_blank" class="btn-wa" data-analytics-location="product_page" data-product-sku="{{ $product->sku }}" data-product-name="{{ $product->name }}">
     <svg class="wa-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
     Написать в WhatsApp
   </a>

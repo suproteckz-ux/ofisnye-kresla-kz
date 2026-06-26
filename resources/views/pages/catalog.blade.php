@@ -25,6 +25,22 @@ $schemaBC = ['@context'=>'https://schema.org','@type'=>'BreadcrumbList','itemLis
 <script type="application/ld+json">{!! json_encode($schemaBC, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
 @endsection
 
+@if(isset($products) && $products->count())
+@push('scripts')
+<x-analytics.event
+    once-key="view_item_list:catalog:{{ request()->fullUrl() }}"
+    :payload="[
+        'event' => 'view_item_list',
+        'ecommerce' => [
+            'item_list_id' => 'catalog',
+            'item_list_name' => 'Каталог',
+            'items' => \App\Support\Analytics::productItems($products->getCollection()),
+        ],
+    ]"
+/>
+@endpush
+@endif
+
 @section('breadcrumbs')
 <x-ui.breadcrumbs :items="$breadcrumbs ?? []"/>
 @endsection
@@ -85,8 +101,13 @@ $schemaBC = ['@context'=>'https://schema.org','@type'=>'BreadcrumbList','itemLis
     {{-- Товары --}}
     @if($products->count())
     <div class="pgrid">
-        @foreach($products as $product)
-            @include('components.product.card', ['product'=>$product])
+        @foreach($products as $index => $product)
+            @include('components.product.card', [
+                'product' => $product,
+                'itemListId' => 'catalog',
+                'itemListName' => 'Каталог',
+                'itemIndex' => (($products->currentPage() - 1) * $products->perPage()) + $index + 1,
+            ])
         @endforeach
     </div>
     <div style="margin-top:32px;display:flex;justify-content:center">

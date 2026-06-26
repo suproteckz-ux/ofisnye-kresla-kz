@@ -36,6 +36,7 @@
             {{-- Поиск --}}
             <form action="{{ route('search') }}" method="GET"
                   class="header-search"
+                  data-analytics-search
                   :data-open="mobileSearch ? 'true' : 'false'"
                   style="flex:1;max-width:620px;min-width:160px;display:flex" id="header-search">
                 <input type="search" name="q" value="{{ request('q') }}" x-ref="searchInput"
@@ -59,10 +60,14 @@
             <div class="header-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
                 @if($phone)
                 <a href="tel:{{ preg_replace('/\D/', '', $phone) }}"
+                   data-analytics-location="header"
+                   data-phone="{{ preg_replace('/\D/', '', $phone) }}"
                    style="display:none;align-items:center;gap:6px;font-size:13px;font-weight:500;color:#57534e;text-decoration:none;white-space:nowrap" id="header-phone">
                     {{ $phone }}
                 </a>
                 <a href="tel:{{ preg_replace('/\D/', '', $phone) }}"
+                   data-analytics-location="header"
+                   data-phone="{{ preg_replace('/\D/', '', $phone) }}"
                    class="header-mobile-phone"
                    aria-label="Позвонить">
                     <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -73,6 +78,7 @@
                 @if($whatsapp)
                 <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener"
                    class="header-desktop-whatsapp"
+                   data-analytics-location="header"
                    style="display:flex;align-items:center;gap:6px;padding:7px 12px;
                           background:#22c55e;color:#fff;font-size:13px;font-weight:600;
                           border-radius:8px;text-decoration:none;white-space:nowrap;flex-shrink:0">

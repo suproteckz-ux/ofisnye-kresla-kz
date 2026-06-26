@@ -8,6 +8,34 @@
 @section('noindex', true)
 @section('suppressCanonical', true)
 
+@if($query)
+@push('scripts')
+<x-analytics.event
+    once-key="search:{{ md5($query . '|' . request()->fullUrl()) }}"
+    :payload="[
+        'event' => 'search',
+        'search_term' => $query,
+    ]"
+/>
+@endpush
+@endif
+
+@if($query && $products instanceof \Illuminate\Contracts\Pagination\Paginator && $products->count())
+@push('scripts')
+<x-analytics.event
+    once-key="view_item_list:search_results:{{ request()->fullUrl() }}"
+    :payload="[
+        'event' => 'view_item_list',
+        'ecommerce' => [
+            'item_list_id' => 'search_results',
+            'item_list_name' => 'Поиск — ' . $query,
+            'items' => \App\Support\Analytics::productItems($products->getCollection()),
+        ],
+    ]"
+/>
+@endpush
+@endif
+
 @section('breadcrumbs')
 <a href="{{ route('home') }}">Главная</a>
 <span class="bc-sep">/</span>
@@ -55,8 +83,13 @@
 
     {{-- Та же сетка 2/4 что в каталоге --}}
     <div class="pgrid">
-        @foreach($products as $product)
-            @include('components.product.card', ['product' => $product])
+        @foreach($products as $index => $product)
+            @include('components.product.card', [
+                'product' => $product,
+                'itemListId' => 'search_results',
+                'itemListName' => 'Поиск — ' . $query,
+                'itemIndex' => (($products->currentPage() - 1) * $products->perPage()) + $index + 1,
+            ])
         @endforeach
     </div>
 

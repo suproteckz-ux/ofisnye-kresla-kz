@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<x-analytics.gtm-head />
 @php
   $pageTitle = trim(View::yieldContent('title')) ?: config('app.name');
   $pageDesc  = trim(View::yieldContent('description')) ?: '';
@@ -189,6 +190,7 @@ button{font-family:inherit;cursor:pointer}
 </style>
 </head>
 <body>
+<x-analytics.gtm-noscript />
 @include('components.ui.header')
 
 
@@ -205,6 +207,7 @@ button{font-family:inherit;cursor:pointer}
 @include('components.schema.local-business')
 @yield('schema')
 @include('components.ui.analytics')
+<x-analytics.helpers />
 @stack('scripts')
 </body>
 </html>

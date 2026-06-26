@@ -45,6 +45,22 @@
         : url('/#contacts');
 @endphp
 
+@if(($hits ?? collect())->isNotEmpty())
+@push('scripts')
+<x-analytics.event
+    once-key="view_item_list:home_featured:{{ request()->fullUrl() }}"
+    :payload="[
+        'event' => 'view_item_list',
+        'ecommerce' => [
+            'item_list_id' => 'home_featured',
+            'item_list_name' => 'Главная — товары',
+            'items' => \App\Support\Analytics::productItems(($hits ?? collect())->take(6)),
+        ],
+    ]"
+/>
+@endpush
+@endif
+
 @section('schema')
 <script type="application/ld+json">{!! json_encode($websiteSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
 <script type="application/ld+json">{!! json_encode($faqSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
@@ -77,7 +93,7 @@
                     </a>
                     @if($wa)
                     <a href="https://wa.me/{{ $wa }}?text={{ urlencode('Здравствуйте! Помогите подобрать офисное кресло.') }}"
-                       target="_blank" rel="noopener" class="home-wa-button">
+                       target="_blank" rel="noopener" class="home-wa-button" data-analytics-location="home_hero">
                         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/></svg>
                         Консультация в WhatsApp
                     </a>
@@ -123,8 +139,13 @@
             <a href="{{ route('catalog') }}">Смотреть все <span>→</span></a>
         </div>
         <div class="home-products-grid">
-            @foreach($hits->take(6) as $product)
-                @include('components.product.card', ['product' => $product])
+            @foreach($hits->take(6) as $index => $product)
+                @include('components.product.card', [
+                    'product' => $product,
+                    'itemListId' => 'home_featured',
+                    'itemListName' => 'Главная — товары',
+                    'itemIndex' => $index + 1,
+                ])
             @endforeach
         </div>
     </div>

@@ -2,6 +2,7 @@
 @if($whatsapp)
 <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener"
    class="floating-whatsapp"
+   data-analytics-location="floating"
    style="position:fixed;bottom:24px;right:24px;z-index:999;
           display:flex;align-items:center;justify-content:center;
           width:56px;height:56px;background:#22c55e;border-radius:50%;

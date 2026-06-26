@@ -110,7 +110,7 @@ class SecurityHeadersMiddleware
                 . "https://mc.yandex.ru "
                 . "https://api.whatsapp.com "
                 . "https://kaspi.kz",
-            "frame-src https://kaspi.kz",
+            "frame-src https://kaspi.kz https://www.googletagmanager.com",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self' https://wa.me",  // форма может вести на WhatsApp
