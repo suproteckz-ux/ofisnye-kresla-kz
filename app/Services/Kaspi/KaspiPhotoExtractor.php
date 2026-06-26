@@ -6,25 +6,50 @@ use Illuminate\Support\Facades\Http;
 
 class KaspiPhotoExtractor
 {
+    private array $lastData = [];
+
     public function __construct(private readonly KaspiBrowser $browser) {}
 
-    public function extract(string $kaspiUrl): array
+    public function extract(string $kaspiUrl, ?int $productId = null, ?string $sku = null, bool $debug = false): array
     {
-        $result = $this->browser->run('kaspi-extract-photos.mjs', [$kaspiUrl], 40);
+        $this->lastData = [];
+
+        $result = $this->browser->run('kaspi-extract-photos.mjs', [
+            $kaspiUrl,
+            (string) ($productId ?: 0),
+            (string) ($sku ?: 'unknown'),
+            $debug ? '1' : '0',
+        ], 60);
         $urls = $this->normalizeUrls($result->data['photo_urls'] ?? []);
+        $this->lastData = array_merge($result->data, ['photo_urls' => $urls]);
 
         if ($urls !== []) {
-            return ['ok' => true, 'kaspi_page_loaded' => true, 'photo_urls' => $urls, 'error' => null];
+            return array_merge($this->lastData, [
+                'ok' => true,
+                'kaspi_page_loaded' => true,
+                'photo_urls' => $urls,
+                'error' => null,
+            ]);
         }
 
         $fallback = $this->extractViaHttp($kaspiUrl);
+        $this->lastData = array_merge($this->lastData, [
+            'photo_urls' => $fallback,
+            'photos_found' => count($fallback),
+        ]);
 
         return [
             'ok' => $fallback !== [],
             'kaspi_page_loaded' => $result->data['kaspi_page_loaded'] ?? false,
             'photo_urls' => $fallback,
             'error' => $fallback === [] ? ($result->error ?: 'photos_not_found') : null,
+            'artifact_paths' => $result->data['artifact_paths'] ?? [],
         ];
+    }
+
+    public function lastData(): array
+    {
+        return $this->lastData;
     }
 
     private function extractViaHttp(string $kaspiUrl): array

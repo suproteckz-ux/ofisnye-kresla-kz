@@ -11,8 +11,9 @@ class KaspiBrowser
         $node = env('KASPI_NODE_BINARY', 'node');
         $scriptPath = base_path("scripts/{$script}");
         $screenshotDir = storage_path('logs/kaspi-screenshots');
+        $debugDir = storage_path('logs/kaspi-debug');
 
-        $process = new Process(array_merge([$node, $scriptPath], $arguments, [$screenshotDir]), base_path());
+        $process = new Process(array_merge([$node, $scriptPath], $arguments, [$screenshotDir, $debugDir]), base_path());
         $process->setTimeout($timeout);
         $process->run();
 
