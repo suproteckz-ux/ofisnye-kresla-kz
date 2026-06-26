@@ -233,3 +233,8 @@
   #wa-text{display:inline!important}
 }
 </style>
+@if(request()->routeIs('contacts'))
+<style>
+.header-nav a[href="{{ route('contacts') }}"]{color:#ff8a00!important;background:#fff7ed!important;font-weight:700!important}
+</style>
+@endif
