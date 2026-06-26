@@ -46,18 +46,49 @@ class InformationPageController extends Controller
         $workingHours = $settings['working_hours']
             ?? $settings['work_hours']
             ?? $settings['schedule']
-            ?? null;
+            ?? 'ежедневно с 09:00 до 21:00';
 
         if ($workingHours) {
             $workingHours = str_replace(['\\n', "\r\n", "\r"], "\n", $workingHours);
             $workingHours = preg_replace('/(?<=\d)n(?=\p{L})/u', "\n", $workingHours);
         }
 
+        $routeUrl = 'https://go.2gis.com/MMVo7';
+        $showroomPhotos = [
+            [
+                'webp' => asset('images/showroom/showroom-entrance.webp'),
+                'jpg' => asset('images/showroom/showroom-entrance.jpg'),
+                'alt' => 'Вход в шоурум офисных кресел Алматы',
+            ],
+            [
+                'webp' => asset('images/showroom/showroom-netbazar.webp'),
+                'jpg' => asset('images/showroom/showroom-netbazar.jpg'),
+                'alt' => 'Шоурум офисных кресел NetBazar в Алматы',
+            ],
+            [
+                'webp' => asset('images/showroom/showroom-headrest-chairs.webp'),
+                'jpg' => asset('images/showroom/showroom-headrest-chairs.jpg'),
+                'alt' => 'Офисные кресла с подголовником в шоуруме',
+            ],
+            [
+                'webp' => asset('images/showroom/showroom-executive-chairs.webp'),
+                'jpg' => asset('images/showroom/showroom-executive-chairs.jpg'),
+                'alt' => 'Кресла для руководителей в шоуруме Алматы',
+            ],
+            [
+                'webp' => asset('images/showroom/showroom-ergonomic-chairs.webp'),
+                'jpg' => asset('images/showroom/showroom-ergonomic-chairs.jpg'),
+                'alt' => 'Эргономичные офисные кресла в наличии',
+            ],
+        ];
+
         return view('pages.contacts', compact(
             'address',
             'phone',
             'whatsapp',
-            'workingHours'
+            'workingHours',
+            'routeUrl',
+            'showroomPhotos'
         ));
     }
 }

@@ -1,138 +1,104 @@
 @php
-    $phone    = \App\Services\CacheService::setting('phone', '');
-    $whatsapp = \App\Services\CacheService::setting('whatsapp', '');
-    $address  = \App\Services\CacheService::setting('address', 'г. Алматы, Казахстан');
-    $siteName = config('app.name', 'Офисные кресла Алматы');
-    $footerCats = \Illuminate\Support\Facades\Cache::remember('footer.cats', 3600,
-        fn() => \App\Models\Category::active()->root()->ordered()->limit(5)->get()
-    );
-    $footerSeoPages = \Illuminate\Support\Facades\Cache::remember('footer.seo_pages', 3600, function () {
-        $preferred = [
-            'ofisnye-kresla-almaty',
-            'kupit-ofisnoe-kreslo-v-almaty',
-            'kresla-rukovoditelia-almaty',
-            'ergonomicnye-kresla-almaty',
-            'ergonomichnye-kresla-almaty',
-            'ofisnye-kresla-s-podgolovnikom-almaty',
-            'kresla-dlia-sotrudnikov',
-            'ofisnye-kresla-dlia-iuridiceskix-lic',
-            'ofisnye-kresla-optom',
-        ];
+    $phone = \App\Services\CacheService::setting('phone', '+7 778 492 11 13') ?: '+7 778 492 11 13';
+    $whatsapp = \App\Services\CacheService::setting('whatsapp', '77784921113') ?: '77784921113';
+    $address = \App\Services\CacheService::setting('address', 'г. Алматы, ул. Муратбаева 138') ?: 'г. Алматы, ул. Муратбаева 138';
+    $siteName = 'Офисные кресла Алматы';
 
-        $pages = \App\Models\SeoPage::active()
-            ->whereIn('slug', $preferred)
+    $resolveFooterUrl = function (array $categorySlugs = [], array $seoSlugs = []) {
+        $category = \App\Models\Category::query()
+            ->where('is_active', true)
+            ->whereIn('slug', $categorySlugs)
             ->get()
-            ->sortBy(fn ($page) => array_search($page->slug, $preferred, true))
-            ->values();
+            ->sortBy(fn ($item) => array_search($item->slug, $categorySlugs, true))
+            ->first();
 
-        if ($pages->count() < 8) {
-            $extra = \App\Models\SeoPage::active()
-                ->whereNotIn('slug', $pages->pluck('slug')->all())
-                ->latest('updated_at')
-                ->limit(8 - $pages->count())
-                ->get();
-            $pages = $pages->concat($extra)->values();
+        if ($category) {
+            return $category->url;
         }
 
-        return $pages->take(8);
-    });
+        $seoPage = \App\Models\SeoPage::query()
+            ->where('is_active', true)
+            ->whereIn('slug', $seoSlugs)
+            ->get()
+            ->sortBy(fn ($item) => array_search($item->slug, $seoSlugs, true))
+            ->first();
+
+        return $seoPage?->url ?? route('catalog');
+    };
+
+    $catalogLinks = [
+        ['Офисные кресла', $resolveFooterUrl(['ofisnye-kresla'], ['ofisnye-kresla-almaty'])],
+        ['Кресла с подголовником', $resolveFooterUrl(['s-podgolovnikom', 'kresla-s-podgolovnikom'], ['ofisnye-kresla-s-podgolovnikom-almaty'])],
+        ['Кресла без подголовника', $resolveFooterUrl(['bez-podgolovnika', 'kresla-bez-podgolovnika'], ['ofisnye-kresla-bez-podgolovnika-almaty'])],
+        ['Кресла для руководителей', $resolveFooterUrl(['kresla-rukovoditelya', 'rukovoditelya'], ['kresla-rukovoditelia-almaty'])],
+    ];
 @endphp
 
-<footer style="background:#111;color:#aaa;margin-top:auto">
-    <div style="max-width:1280px;margin:0 auto;padding:40px 24px 20px">
-        <div class="footer-cols" style="margin-bottom:32px">
-
-            {{-- Колонка 1 --}}
-            <div>
-                <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px">
-                    <div style="width:30px;height:30px;background:#ff8a00;border-radius:7px;
-                                display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                        <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24">
+<footer class="site-footer">
+    <div class="site-footer__inner">
+        <div class="site-footer__grid">
+            <div class="site-footer__brand">
+                <a href="{{ route('home') }}" class="site-footer__logo" aria-label="{{ $siteName }}">
+                    <span class="site-footer__logo-mark">
+                        <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 4C9 4 7 6.5 7 9.5v2c0 1.2.4 2.3 1 3.1H4v2h16v-2h-4c.6-.8 1-1.9 1-3.1v-2C17 6.5 15 4 12 4z"/>
                             <rect x="11" y="16.5" width="2" height="3" rx="1"/>
                         </svg>
-                    </div>
-                    <span style="color:#fff;font-weight:700;font-size:15px">{{ $siteName }}</span>
-                </div>
-                <p style="font-size:13px;line-height:1.7;color:#777;max-width:220px">
-                    Продажа офисных кресел в Алматы и Казахстане
-                </p>
-            </div>
-
-            {{-- Колонка 2: Каталог --}}
-            <div>
-                <div style="color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Каталог</div>
-                @forelse($footerCats as $cat)
-                <a href="{{ $cat->url }}"
-                   style="display:block;font-size:13px;color:#777;margin-bottom:8px;
-                          text-decoration:none;transition:color .15s"
-                   onmouseover="this.style.color='#fff'"
-                   onmouseout="this.style.color='#777'">{{ $cat->name }}</a>
-                @empty
-                <a href="{{ route('catalog') }}" style="display:block;font-size:13px;color:#777;margin-bottom:8px;text-decoration:none">Офисные кресла</a>
-                <a href="{{ route('catalog.category','kresla-rukovoditelya') }}" style="display:block;font-size:13px;color:#777;margin-bottom:8px;text-decoration:none">Кресла руководителя</a>
-                <a href="{{ route('catalog.category','ergonomichnye-kresla') }}" style="display:block;font-size:13px;color:#777;text-decoration:none">Эргономичные кресла</a>
-                @endforelse
-            </div>
-
-            {{-- Колонка 3: Покупателям --}}
-            <div>
-                <div style="color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Покупателям</div>
-                <a href="{{ route('delivery-payment') }}#delivery" style="display:block;font-size:13px;color:#777;margin-bottom:8px">Доставка</a>
-                <a href="{{ route('delivery-payment') }}#payment" style="display:block;font-size:13px;color:#777;margin-bottom:8px">Оплата</a>
-                <a href="{{ route('delivery-payment') }}#warranty" style="display:block;font-size:13px;color:#777">Гарантия</a>
-            </div>
-
-            {{-- Колонка 4: Полезное --}}
-            <div>
-                <a href="{{ route('seo-pages.index') }}" style="display:block;color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Полезное</a>
-                @foreach($footerSeoPages as $seoPage)
-                <a href="{{ $seoPage->url }}"
-                   style="display:block;font-size:13px;color:#777;margin-bottom:8px;text-decoration:none;transition:color .15s"
-                   onmouseover="this.style.color='#fff'"
-                   onmouseout="this.style.color='#777'">{{ $seoPage->seoH1() }}</a>
-                @endforeach
-            </div>
-
-            {{-- Колонка 5: Контакты --}}
-            <div>
-                <a href="{{ route('contacts') }}" style="display:block;color:#fff;font-weight:600;font-size:14px;margin-bottom:12px">Контакты</a>
-                @if($address)
-                <p style="font-size:13px;color:#777;margin-bottom:8px">{{ $address }}</p>
-                @endif
-                @if($phone)
-                <a href="tel:{{ preg_replace('/\D/','',$phone) }}"
-                   style="display:block;font-size:14px;color:#fff;font-weight:600;margin-bottom:12px;text-decoration:none">
-                    {{ $phone }}
+                    </span>
+                    <span>{{ $siteName }}</span>
                 </a>
-                @endif
-                @if($whatsapp)
-                <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener"
-                   style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;
-                          background:#22c55e;color:#fff;font-weight:600;font-size:13px;
-                          border-radius:8px;text-decoration:none">
-                    <svg width="15" height="15" fill="#fff" viewBox="0 0 24 24">
+                <p>Продажа офисных кресел в Алматы и Казахстане.</p>
+            </div>
+
+            <nav class="site-footer__col" aria-label="Каталог в футере">
+                <div class="site-footer__title">Каталог</div>
+                @foreach($catalogLinks as [$label, $url])
+                    <a href="{{ $url }}">{{ $label }}</a>
+                @endforeach
+            </nav>
+
+            <nav class="site-footer__col" aria-label="Покупателям">
+                <div class="site-footer__title">Покупателям</div>
+                <a href="{{ route('delivery-payment') }}#delivery">Доставка</a>
+                <a href="{{ route('delivery-payment') }}#payment">Оплата</a>
+                <a href="{{ route('delivery-payment') }}#warranty">Гарантия</a>
+                <a href="{{ route('contacts') }}">Контакты</a>
+            </nav>
+
+            <div class="site-footer__contacts">
+                <a href="{{ route('contacts') }}" class="site-footer__title">Контакты</a>
+                <p>{{ $address }}</p>
+                <a href="tel:{{ preg_replace('/\D/', '', $phone) }}" class="site-footer__phone">{{ $phone }}</a>
+                <a href="https://wa.me/{{ preg_replace('/\D/', '', $whatsapp) }}" target="_blank" rel="noopener" class="site-footer__wa">
+                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
                     </svg>
                     WhatsApp
                 </a>
-                @endif
             </div>
         </div>
 
-        <div style="border-top:1px solid #222;padding-top:16px;font-size:12px;color:#555">
+        <div class="site-footer__bottom">
             © {{ date('Y') }} {{ $siteName }}. Все права защищены.
         </div>
     </div>
 </footer>
 
 <style>
-.footer-cols{display:grid;grid-template-columns:1fr;gap:28px}
-@media(max-width:639px){
-  footer>div{padding:28px 18px 17px!important}
-  .footer-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;margin-bottom:24px!important}
-  .footer-cols>div:first-child,.footer-cols>div:last-child{grid-column:1/-1}
-}
-@media(min-width:640px){.footer-cols{grid-template-columns:repeat(2,1fr);gap:32px}}
-@media(min-width:1024px){.footer-cols{grid-template-columns:1.7fr 1fr 1fr 1.35fr 1.35fr;gap:34px}}
+.site-footer{background:#111;color:#9ca3af;margin-top:auto}
+.site-footer__inner{max-width:1280px;margin:0 auto;padding:42px 24px 20px}
+.site-footer__grid{display:grid;grid-template-columns:1fr;gap:28px;margin-bottom:30px}
+.site-footer__logo{display:inline-flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:16px;text-decoration:none;margin-bottom:12px}
+.site-footer__logo-mark{width:32px;height:32px;border-radius:9px;background:#ff8a00;color:#fff;display:grid;place-items:center;flex:0 0 32px}
+.site-footer__brand p,.site-footer__contacts p{font-size:13px;line-height:1.7;color:#8a8a8a;margin:0;max-width:270px}
+.site-footer__title{display:block;color:#fff;font-weight:700;font-size:14px;margin-bottom:13px;text-decoration:none}
+.site-footer__col a{display:block;color:#8a8a8a;font-size:13px;text-decoration:none;margin-bottom:9px;line-height:1.45;transition:color .15s}
+.site-footer__col a:hover,.site-footer__contacts a:hover{color:#fff}
+.site-footer__phone{display:inline-block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin:11px 0 13px}
+.site-footer__wa{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:9px;background:#22c55e;color:#fff!important;font-size:13px;font-weight:800;text-decoration:none;line-height:1}
+.site-footer__wa:hover{background:#16a34a}
+.site-footer__bottom{border-top:1px solid #242424;padding-top:16px;color:#666;font-size:12px}
+@media(min-width:640px){.site-footer__grid{grid-template-columns:1.35fr 1fr 1fr;gap:30px}.site-footer__contacts{grid-column:1/-1}}
+@media(min-width:1024px){.site-footer__grid{grid-template-columns:1.7fr 1fr 1fr 1.25fr;gap:42px}.site-footer__contacts{grid-column:auto}}
+@media(max-width:639px){.site-footer__inner{padding:32px 18px 18px}.site-footer__grid{gap:24px}.site-footer__wa{width:auto}.site-footer__bottom{line-height:1.6}}
 </style>
