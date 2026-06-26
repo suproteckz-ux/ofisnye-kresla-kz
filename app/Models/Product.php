@@ -23,6 +23,7 @@ class Product extends Model
         'attributes', 'faq',
         'main_image', 'main_image_webp', 'main_image_alt',
         'meta_title', 'meta_description', 'h1', 'seo_text', 'canonical_url',
+        'resolved_kaspi_url',
         'is_active', 'is_new', 'is_hit', 'is_popular',
         'views', 'sort_order',
     ];
@@ -146,6 +147,7 @@ class Product extends Model
     public function categories(): BelongsToMany { return $this->belongsToMany(Category::class, 'product_category')->withTimestamps(); }
     public function brand(): BelongsTo    { return $this->belongsTo(Brand::class); }
     public function images(): HasMany     { return $this->hasMany(ProductImage::class)->orderBy('sort_order'); }
+    public function kaspiPhotoImportLogs(): HasMany { return $this->hasMany(KaspiPhotoImportLog::class)->latest(); }
     public function seoPages(): BelongsToMany  { return $this->belongsToMany(SeoPage::class, 'seo_page_product'); }
     public function blogPosts(): BelongsToMany { return $this->belongsToMany(BlogPost::class, 'blog_post_product'); }
 

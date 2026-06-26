@@ -18,6 +18,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Notifications\Notification;
 use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -31,6 +32,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -277,6 +279,21 @@ class ProductResource extends Resource
                     ->width('55px')
                     ->grow(false),
 
+                TextColumn::make('images_count')
+                    ->label('Фото')
+                    ->counts('images')
+                    ->alignCenter()
+                    ->badge()
+                    ->color(fn (?int $state): string => ((int) $state) > 0 ? 'success' : 'gray')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('resolved_kaspi_url')
+                    ->label('Kaspi')
+                    ->formatStateUsing(fn (?string $state): string => filled($state) ? 'URL есть' : 'нет URL')
+                    ->badge()
+                    ->color(fn (?string $state): string => filled($state) ? 'success' : 'gray')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 // Бренд — скрыт по умолчанию
                 TextColumn::make('brand.name')
                     ->label('Бренд')
@@ -340,6 +357,30 @@ class ProductResource extends Resource
                         return $r->url;
                     })
                     ->openUrlInNewTab(),
+
+                Action::make('kaspi_photos')
+                    ->label('')
+                    ->icon('heroicon-o-photo')
+                    ->tooltip('Загрузить фото с Kaspi')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Загрузить фото с Kaspi')
+                    ->modalDescription('Фото будут только добавлены в галерею товара. Цена, остатки, название, описание, SEO и категории не меняются.')
+                    ->action(function (Product $record): void {
+                        Artisan::call('kaspi:photos', [
+                            '--id' => $record->id,
+                            '--limit' => 1,
+                            '--append-only' => true,
+                        ]);
+
+                        $output = trim(Artisan::output());
+
+                        Notification::make()
+                            ->title('Импорт фото Kaspi завершён')
+                            ->body(Str::limit($output ?: 'Команда выполнена.', 500))
+                            ->success()
+                            ->send();
+                    }),
 
                 DeleteAction::make()
                     ->iconButton()
