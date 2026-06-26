@@ -148,6 +148,7 @@ class Product extends Model
     public function brand(): BelongsTo    { return $this->belongsTo(Brand::class); }
     public function images(): HasMany     { return $this->hasMany(ProductImage::class)->orderBy('sort_order'); }
     public function kaspiPhotoImportLogs(): HasMany { return $this->hasMany(KaspiPhotoImportLog::class)->latest(); }
+    public function marketradarSyncLogs(): HasMany { return $this->hasMany(MarketRadarSyncLog::class)->latest(); }
     public function seoPages(): BelongsToMany  { return $this->belongsToMany(SeoPage::class, 'seo_page_product'); }
     public function blogPosts(): BelongsToMany { return $this->belongsToMany(BlogPost::class, 'blog_post_product'); }
 

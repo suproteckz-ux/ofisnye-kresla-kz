@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Category;
 use App\Models\Product;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -33,6 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -193,6 +195,58 @@ class ProductResource extends Resource
                         )),
                 ]),
 
+            Section::make('MarketRadar')
+                ->description('Автоматизация цены, остатка, наличия и фото по точному SKU из MarketRadar XML.')
+                ->columns(3)
+                ->schema([
+                    TextInput::make('marketradar_sku_view')
+                        ->label('SKU')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->sku ?? '')),
+                    TextInput::make('marketradar_last_status_view')
+                        ->label('Последний статус')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('status') ?? 'нет')),
+                    TextInput::make('marketradar_last_sync_view')
+                        ->label('Последняя синхронизация')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => static::latestMarketRadarDate($record, 'Y-m-d H:i') ?: 'нет'),
+                    TextInput::make('marketradar_matched_by_view')
+                        ->label('matched_by')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('matched_by') ?? '')),
+                    TextInput::make('marketradar_xml_price_view')
+                        ->label('Цена XML')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('new_price') ?? '')),
+                    TextInput::make('marketradar_xml_quantity_view')
+                        ->label('Остаток XML')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('new_quantity') ?? '')),
+                    TextInput::make('marketradar_xml_photos_view')
+                        ->label('Фото XML')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('photos_found') ?? '0')),
+                    TextInput::make('marketradar_saved_photos_view')
+                        ->label('Фото загружено')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => (string) ($record?->marketradarSyncLogs()->latest()->value('photos_saved') ?? '0')),
+                    TextInput::make('marketradar_error_view')
+                        ->label('Ошибка')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn (?Product $record): string => Str::limit((string) ($record?->marketradarSyncLogs()->latest()->value('error_message') ?? ''), 180)),
+                ])
+                ->collapsed(),
+
             Section::make('SEO')
                 ->collapsed()
                 ->schema([
@@ -287,11 +341,21 @@ class ProductResource extends Resource
                     ->color(fn (?int $state): string => ((int) $state) > 0 ? 'success' : 'gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('resolved_kaspi_url')
-                    ->label('Kaspi')
-                    ->formatStateUsing(fn (?string $state): string => filled($state) ? 'URL есть' : 'нет URL')
+                TextColumn::make('marketradar_status')
+                    ->label('MarketRadar')
+                    ->state(fn (Product $r): string => (string) ($r->marketradarSyncLogs()->latest()->value('status') ?? 'нет'))
                     ->badge()
-                    ->color(fn (?string $state): string => filled($state) ? 'success' : 'gray')
+                    ->color(fn (string $state): string => match ($state) {
+                        'price_updated', 'stock_updated', 'photos_updated', 'matched' => 'success',
+                        'not_found', 'failed' => 'danger',
+                        'dry_run' => 'warning',
+                        default => 'gray',
+                    })
+                    ->toggleable(),
+
+                TextColumn::make('marketradar_last_sync')
+                    ->label('MR sync')
+                    ->state(fn (Product $r): string => static::latestMarketRadarDate($r, null) ?: '—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 // Бренд — скрыт по умолчанию
@@ -358,7 +422,47 @@ class ProductResource extends Resource
                     })
                     ->openUrlInNewTab(),
 
+                Action::make('marketradar_check')
+                    ->label('')
+                    ->icon('heroicon-o-magnifying-glass')
+                    ->tooltip('Проверить MarketRadar')
+                    ->color('info')
+                    ->action(function (Product $record): void {
+                        static::runMarketRadarForProduct($record, ['--dry-run' => true, '--no-photos' => true], 'MarketRadar проверен');
+                    }),
+
+                Action::make('marketradar_sync')
+                    ->label('')
+                    ->icon('heroicon-o-arrow-path')
+                    ->tooltip('Обновить из MarketRadar')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (Product $record): void {
+                        static::runMarketRadarForProduct($record, [], 'MarketRadar обновлен');
+                    }),
+
+                Action::make('marketradar_price_stock')
+                    ->label('')
+                    ->icon('heroicon-o-banknotes')
+                    ->tooltip('Обновить цену и остаток')
+                    ->color('gray')
+                    ->requiresConfirmation()
+                    ->action(function (Product $record): void {
+                        static::runMarketRadarForProduct($record, ['--no-photos' => true], 'Цена и остаток обновлены');
+                    }),
+
+                Action::make('marketradar_photos')
+                    ->label('')
+                    ->icon('heroicon-o-photo')
+                    ->tooltip('Загрузить фото из MarketRadar')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->action(function (Product $record): void {
+                        static::runMarketRadarForProduct($record, ['--photos' => true, '--no-prices' => true, '--no-stock' => true, '--only-missing-photos' => true], 'Фото MarketRadar обработаны');
+                    }),
+
                 Action::make('kaspi_photos')
+                    ->visible(false)
                     ->label('')
                     ->icon('heroicon-o-photo')
                     ->tooltip('Загрузить фото с Kaspi')
@@ -387,7 +491,25 @@ class ProductResource extends Resource
                     ->tooltip('Удалить'),
             ])
             ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
+                BulkActionGroup::make([
+                    BulkAction::make('marketradar_bulk_check')
+                        ->label('Проверить MarketRadar')
+                        ->requiresConfirmation()
+                        ->action(fn (Collection $records) => static::runMarketRadarBulk($records, ['--dry-run' => true, '--no-photos' => true], 'MarketRadar проверен')),
+                    BulkAction::make('marketradar_bulk_price_stock')
+                        ->label('Обновить цену и остаток')
+                        ->requiresConfirmation()
+                        ->action(fn (Collection $records) => static::runMarketRadarBulk($records, ['--no-photos' => true], 'Цена и остаток обновлены')),
+                    BulkAction::make('marketradar_bulk_photos')
+                        ->label('Загрузить фото')
+                        ->requiresConfirmation()
+                        ->action(fn (Collection $records) => static::runMarketRadarBulk($records, ['--photos' => true, '--no-prices' => true, '--no-stock' => true, '--only-missing-photos' => true], 'Фото MarketRadar обработаны')),
+                    BulkAction::make('marketradar_bulk_all')
+                        ->label('Обновить всё')
+                        ->requiresConfirmation()
+                        ->action(fn (Collection $records) => static::runMarketRadarBulk($records, [], 'MarketRadar обновлен')),
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('updated_at', 'desc')
             ->paginated([25, 50, 100])
@@ -411,5 +533,60 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit'   => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    private static function runMarketRadarForProduct(Product $record, array $options, string $title): void
+    {
+        Artisan::call('marketradar:sync', [
+            '--sku' => $record->sku,
+            '--limit' => 1,
+            ...$options,
+        ]);
+
+        static::notify($title, Artisan::output());
+    }
+
+    private static function runMarketRadarBulk(Collection $records, array $options, string $title): void
+    {
+        $processed = 0;
+        $output = [];
+
+        foreach ($records->take(20) as $record) {
+            Artisan::call('marketradar:sync', [
+                '--sku' => $record->sku,
+                '--limit' => 1,
+                ...$options,
+            ]);
+
+            $output[] = trim(Artisan::output());
+            $processed++;
+        }
+
+        static::notify($title . " ({$processed})", implode("\n", array_slice($output, -3)));
+    }
+
+    private static function notify(string $title, string $body): void
+    {
+        Notification::make()
+            ->title($title)
+            ->body(Str::limit(trim($body) ?: 'Команда выполнена.', 700))
+            ->success()
+            ->send();
+    }
+
+    private static function latestMarketRadarDate(?Product $record, ?string $format): ?string
+    {
+        $value = $record?->marketradarSyncLogs()->latest()->value('created_at');
+        if (! $value) {
+            return null;
+        }
+
+        try {
+            $date = $value instanceof \DateTimeInterface ? $value : \Illuminate\Support\Carbon::parse((string) $value);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return $format ? $date->format($format) : $date->diffForHumans();
     }
 }

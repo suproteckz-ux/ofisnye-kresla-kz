@@ -25,6 +25,11 @@ Schedule::call(function () {
   ->name('cache:warmup-homepage')
   ->withoutOverlapping();
 
+Schedule::command('marketradar:sync --no-photos')
+    ->everyThreeHours()
+    ->name('marketradar:sync-prices-stock')
+    ->withoutOverlapping();
+
 // ── Мониторинг зависших импортов (раз в час) ──────────────────
 Schedule::call(function () {
     $stuck = \App\Models\ImportBatch::where('status', 'processing')

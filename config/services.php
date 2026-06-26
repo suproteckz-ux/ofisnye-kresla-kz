@@ -18,4 +18,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'marketradar' => [
+        'feed_url' => env('MARKETRADAR_FEED_URL', 'https://feed.marketradar.kz/satu/bF2rBm3rBUmZwUW6HHBHU7lyWTlo60gv/0c72f008-e286-4785-a903-2941d6360943.xml'),
+    ],
 ];
