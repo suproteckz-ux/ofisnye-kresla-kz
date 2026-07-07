@@ -4,9 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BlogPostResource\Pages;
 use App\Models\BlogPost;
+use App\Models\Product;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -98,6 +101,35 @@ class BlogPostResource extends Resource
                     MarkdownEditor::make('content')
                         ->label('Текст статьи')
                         ->nullable()
+                        ->columnSpanFull(),
+                ]),
+
+            Section::make('FAQ')
+                ->collapsed()
+                ->schema([
+                    Repeater::make('faq')
+                        ->label('')
+                        ->schema([
+                            TextInput::make('question')->label('Вопрос')->required(),
+                            Textarea::make('answer')->label('Ответ')->required()->rows(3),
+                        ])
+                        ->addActionLabel('Добавить вопрос')
+                        ->defaultItems(0)
+                        ->reorderable()
+                        ->columnSpanFull(),
+                ]),
+
+            Section::make('Связанные товары')
+                ->collapsed()
+                ->schema([
+                    Select::make('products')
+                        ->label('Товары из статьи')
+                        ->relationship('products', 'name')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->getOptionLabelFromRecordUsing(fn (Product $record): string => trim(($record->sku ? $record->sku.' — ' : '').$record->name))
+                        ->helperText('Используется существующая связь blog_post_product. Если товары не выбраны, на сайте покажутся популярные товары.')
                         ->columnSpanFull(),
                 ]),
 

@@ -24,7 +24,7 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 @endif
 <meta property="og:site_name" content="{{ config('app.name') }}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{{ $ogType ?? 'website' }}">
 <meta property="og:title" content="{{ $pageTitle }}">
 <meta property="og:description" content="{{ $pageDesc }}">
 <meta property="og:image" content="{{ $ogImg }}">
@@ -34,6 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+@stack('head')
 <script src="https://unpkg.com/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
 <style>
 /* ── Reset ── */
