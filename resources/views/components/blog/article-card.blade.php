@@ -2,7 +2,6 @@
 
 @php
     $excerpt = \App\Support\BlogContent::excerpt($post, 130);
-    $topic = \App\Support\BlogContent::topic($post);
     $minutes = \App\Support\BlogContent::readingTime($post->content);
 @endphp
 
@@ -14,7 +13,6 @@
     </a>
     <div class="blog-article-card__body">
         <div class="blog-card-meta">
-            <span>{{ $topic }}</span>
             @if($post->published_at)<time datetime="{{ $post->published_at->format('Y-m-d') }}">{{ $post->published_at->translatedFormat('d F Y') }}</time>@endif
             <span>{{ $minutes }} мин</span>
         </div>

@@ -36,29 +36,6 @@
             <div class="blog-list-hero__art" aria-hidden="true"></div>
         </header>
 
-        <div class="blog-tools">
-            <div class="blog-topics" aria-label="Категории статей">
-                @foreach($topics as $topicLabel)
-                    @php
-                        $isAll = $topicLabel === 'Все';
-                        $href = route('blog', array_filter([
-                            'q' => $search ?: null,
-                            'topic' => $isAll ? null : $topicLabel,
-                        ]));
-                    @endphp
-                    <x-blog.category-pill :label="$topicLabel" :href="$href" :active="$isAll ? ($topic === '') : ($topic === $topicLabel)" />
-                @endforeach
-            </div>
-
-            <form class="blog-search" action="{{ route('blog') }}" method="GET" role="search">
-                @if($topic)
-                <input type="hidden" name="topic" value="{{ $topic }}">
-                @endif
-                <input type="search" name="q" value="{{ $search }}" placeholder="Поиск по статьям" aria-label="Поиск по статьям">
-                <button type="submit">Найти</button>
-            </form>
-        </div>
-
         @if($featuredPost)
             <x-blog.featured-article :post="$featuredPost" />
         @endif
@@ -92,7 +69,7 @@
         @else
         <div class="blog-empty">
             <h2>Статей не найдено</h2>
-            <p>Попробуйте изменить запрос или открыть все материалы блога.</p>
+            <p>Материалы блога скоро появятся.</p>
         </div>
         @endif
     </div>

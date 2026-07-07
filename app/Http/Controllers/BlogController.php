@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
-use App\Models\Category;
 use App\Models\Product;
 use App\Support\BlogContent;
 use Illuminate\Http\Request;
@@ -12,25 +11,9 @@ class BlogController extends Controller
 {
     public function index(Request $request)
     {
-        $search = trim((string) $request->get('q', ''));
-        $topic = trim((string) $request->get('topic', ''));
-        $topicKeywords = $this->topicKeywords($topic);
-
         $posts = BlogPost::active()
-            ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('meta_description', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%");
-            }))
-            ->when($topicKeywords !== [], fn ($query) => $query->where(function ($query) use ($topicKeywords) {
-                foreach ($topicKeywords as $keyword) {
-                    $query->orWhere('title', 'like', "%{$keyword}%")
-                        ->orWhere('content', 'like', "%{$keyword}%");
-                }
-            }))
             ->latest('published_at')
-            ->paginate(12)
-            ->withQueryString();
+            ->paginate(12);
 
         $currentPage = (int) $request->get('page', 1);
         $baseUrl     = url('/blog');
@@ -48,7 +31,6 @@ class BlogController extends Controller
             . 'кресло для руководителя, обзоры и сравнения моделей. Советы экспертов.';
 
         $featuredPost = $currentPage === 1 ? $posts->first() : null;
-        $topics = ['Все', 'Эргономика', 'Выбор', 'Обзор', 'Советы', 'Руководителям'];
 
         return view('pages.blog', compact(
             'posts',
@@ -57,10 +39,7 @@ class BlogController extends Controller
             'metaTitle',
             'metaDesc',
             'noindex',
-            'featuredPost',
-            'topics',
-            'search',
-            'topic'
+            'featuredPost'
         ));
     }
 
@@ -85,10 +64,9 @@ class BlogController extends Controller
 
         if (!$post) abort(404);
 
-        [$articleHtml, $toc] = BlogContent::withAnchors($post->content);
+        $articleHtml = (string) $post->content;
         $readingTime = BlogContent::readingTime($post->content);
         $excerpt = BlogContent::excerpt($post);
-        $topic = BlogContent::topic($post);
         $faq = BlogContent::faq($post);
 
         $relatedProducts = $post->products;
@@ -117,56 +95,19 @@ class BlogController extends Controller
             ->limit(3)
             ->get(['id', 'title', 'slug', 'cover_image', 'cover_image_webp', 'cover_image_alt', 'meta_description', 'content', 'published_at']);
 
-        $recent = $relatedPosts;
-
-        $previousPost = BlogPost::active()
-            ->where('published_at', '<', $post->published_at)
-            ->latest('published_at')
-            ->first(['id', 'title', 'slug']);
-
-        $nextPost = BlogPost::active()
-            ->where('published_at', '>', $post->published_at)
-            ->oldest('published_at')
-            ->first(['id', 'title', 'slug']);
-
-        $popularCategories = Category::active()
-            ->whereHas('parent', fn ($query) => $query->where('slug', 'ofisnye-kresla'))
-            ->with('parent:id,slug')
-            ->ordered()
-            ->limit(6)
-            ->get(['id', 'parent_id', 'name', 'slug', 'image', 'image_webp', 'meta_description']);
-
         $ogImage = $post->cover_image
             ? asset('storage/' . $post->cover_image)
             : asset('img/og-default.jpg');
 
         return view('pages.blog-post', compact(
             'post',
-            'recent',
             'relatedPosts',
             'relatedProducts',
-            'popularCategories',
-            'previousPost',
-            'nextPost',
             'articleHtml',
-            'toc',
             'readingTime',
             'excerpt',
-            'topic',
             'faq',
             'ogImage'
         ) + ['ogType' => 'article']);
-    }
-
-    private function topicKeywords(string $topic): array
-    {
-        return match ($topic) {
-            'Эргономика' => ['эргоном', 'ортопед', 'спин'],
-            'Обзор' => ['обзор', 'сравнен', 'топ'],
-            'Советы' => ['совет', 'как ', 'выбрать'],
-            'Руководителям' => ['руковод', 'директор'],
-            'Выбор' => ['выбор', 'купить', 'подобрать'],
-            default => [],
-        };
     }
 }

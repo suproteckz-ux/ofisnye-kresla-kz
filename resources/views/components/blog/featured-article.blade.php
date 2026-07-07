@@ -1,10 +1,7 @@
 @props(['post'])
 
 @if($post)
-@php
-    $excerpt = \App\Support\BlogContent::excerpt($post, 190);
-    $topic = \App\Support\BlogContent::topic($post);
-@endphp
+@php($excerpt = \App\Support\BlogContent::excerpt($post, 190))
 <article class="blog-featured">
     @if($post->cover_image)
     <a class="blog-featured__image" href="{{ $post->url }}">
@@ -12,7 +9,7 @@
     </a>
     @endif
     <div class="blog-featured__body">
-        <span class="blog-pill">{{ $topic }}</span>
+        <span class="blog-pill">Материал блога</span>
         <h2><a href="{{ $post->url }}">{{ $post->title }}</a></h2>
         <p>{{ $excerpt }}</p>
         <a class="btn-orange" href="{{ $post->url }}">Читать статью</a>

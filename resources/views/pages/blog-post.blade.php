@@ -7,10 +7,6 @@
 <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
 @endpush
 
-@push('scripts')
-<script src="{{ asset('js/blog.js') }}" defer></script>
-@endpush
-
 @section('canonical')
 <link rel="canonical" href="{{ $post->url }}">
 @endsection
@@ -23,41 +19,21 @@
 @endsection
 
 @section('content')
-<x-blog.reading-progress />
-
 <div class="blog-shell">
     <div class="container">
-        <x-blog.hero :post="$post" :excerpt="$excerpt" :reading-time="$readingTime" :topic="$topic" />
+        <x-blog.hero :post="$post" :excerpt="$excerpt" :reading-time="$readingTime" />
 
-        <div class="blog-layout">
-            <div class="blog-main">
-                <x-blog.article-body :html="$articleHtml" />
+        <main class="blog-article-page">
+            <x-blog.article-body :html="$articleHtml" />
 
-                <x-blog.related-products :products="$relatedProducts" />
-                <x-blog.popular-categories :categories="$popularCategories" />
-                <x-blog.faq :items="$faq" />
-                <x-blog.author />
-                <x-blog.newsletter />
-                <x-blog.related-posts :posts="$relatedPosts" />
-
-                @if($previousPost || $nextPost)
-                <nav class="blog-post-nav" aria-label="Навигация по статьям">
-                    @if($previousPost)
-                    <a href="{{ $previousPost->url }}"><span>Предыдущая статья</span>{{ $previousPost->title }}</a>
-                    @endif
-                    @if($nextPost)
-                    <a href="{{ $nextPost->url }}"><span>Следующая статья</span>{{ $nextPost->title }}</a>
-                    @endif
-                </nav>
-                @endif
-            </div>
-
-            <x-blog.sidebar :toc="$toc" :categories="$popularCategories" />
-        </div>
+            <x-blog.cta />
+            <x-blog.author />
+            <x-blog.related-products :products="$relatedProducts" />
+            <x-blog.related-posts :posts="$relatedPosts" />
+            <x-blog.faq :items="$faq" />
+        </main>
     </div>
 </div>
-
-<x-blog.back-to-top />
 @endsection
 
 @section('schema')
