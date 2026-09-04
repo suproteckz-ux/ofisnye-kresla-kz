@@ -41,7 +41,7 @@ class ChairStoreSeeder extends Seeder
             'address'        => 'г. Алматы, Казахстан',
             'working_hours'  => 'Пн–Сб: 9:00–18:00',
             'instagram'      => '',
-            'yandex_metrika' => '',
+            'yandex_metrika_id' => '104225120',
             'google_analytics' => '',
         ];
         foreach ($defaults as $key => $value) {
@@ -70,7 +70,6 @@ class ChairStoreSeeder extends Seeder
                     ['question' => 'Какая гарантия на кресла?', 'answer' => 'На большинство моделей — 12 месяцев на механизмы, газлифт и основание.'],
                     ['question' => 'Можно ли примерить кресло?', 'answer' => 'Да, у нас есть шоурум в Алматы. Адрес уточняйте по телефону или в WhatsApp.'],
                 ],
-),
             ]
         );
 
