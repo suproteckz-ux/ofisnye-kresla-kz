@@ -22,3 +22,4 @@ yarn-error.log
 /storage/framework/sessions/*
 /storage/framework/views/*
 /storage/framework/cache/*
+/storage/app/codex-screenshots/
