@@ -20,7 +20,7 @@
                 "reference": "2.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -38,7 +38,7 @@
                 "reference": "1.10.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -56,7 +56,7 @@
                 "reference": "0.14.8"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -74,7 +74,7 @@
                 "reference": "3.2.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -92,7 +92,7 @@
                 "reference": "5.0.5"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -110,7 +110,7 @@
                 "reference": "3.3.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -128,7 +128,7 @@
                 "reference": "v0.3.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -146,7 +146,7 @@
                 "reference": "v2.2.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -164,7 +164,7 @@
                 "reference": "v3.0.3"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -182,7 +182,7 @@
                 "reference": "2.1.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -200,7 +200,7 @@
                 "reference": "3.0.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -218,7 +218,7 @@
                 "reference": "v3.6.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -236,7 +236,7 @@
                 "reference": "4.0.4"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -244,17 +244,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/actions/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/actions/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/actions.git",
+                "url": "https://github.com/filamentphp/actions.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -262,17 +262,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/filament/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/panels/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/filament.git",
+                "url": "https://github.com/filamentphp/panels.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -280,17 +280,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/forms/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/forms/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/forms.git",
+                "url": "https://github.com/filamentphp/forms.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -298,17 +298,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/infolists/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/infolists/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/infolists.git",
+                "url": "https://github.com/filamentphp/infolists.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -316,17 +316,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/notifications/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/notifications/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/notifications.git",
+                "url": "https://github.com/filamentphp/notifications.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -334,17 +334,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/query-builder/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/query-builder/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/query-builder.git",
+                "url": "https://github.com/filamentphp/query-builder.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -352,17 +352,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/schemas/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/schemas/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/schemas.git",
+                "url": "https://github.com/filamentphp/schemas.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -370,17 +370,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/support/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/support/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/support.git",
+                "url": "https://github.com/filamentphp/support.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -388,17 +388,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/tables/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/tables/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/tables.git",
+                "url": "https://github.com/filamentphp/tables.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -406,17 +406,17 @@
             "version": "v4.11.6",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filament/widgets/zipball/v4.11.6",
+                "url": "https://api.github.com/repos/filamentphp/widgets/zipball/v4.11.6",
                 "reference": "v4.11.6",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/filament/widgets.git",
+                "url": "https://github.com/filamentphp/widgets.git",
                 "reference": "v4.11.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -434,7 +434,7 @@
                 "reference": "v1.4.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -452,7 +452,7 @@
                 "reference": "7.11.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -470,7 +470,7 @@
                 "reference": "2.5.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -488,7 +488,7 @@
                 "reference": "2.11.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -506,7 +506,7 @@
                 "reference": "v1.0.6"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -524,7 +524,7 @@
                 "reference": "4.2.4"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -542,7 +542,7 @@
                 "reference": "3.11.8"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -560,7 +560,7 @@
                 "reference": "1.5.9"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -578,7 +578,7 @@
                 "reference": "4.3.2"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -596,7 +596,7 @@
                 "reference": "v12.61.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -614,7 +614,7 @@
                 "reference": "v0.3.18"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -632,7 +632,7 @@
                 "reference": "v2.0.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -650,7 +650,7 @@
                 "reference": "v2.11.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -668,7 +668,7 @@
                 "reference": "2.8.2"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -686,7 +686,7 @@
                 "reference": "v1.2.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -704,7 +704,7 @@
                 "reference": "9.28.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -722,7 +722,7 @@
                 "reference": "3.34.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -740,7 +740,7 @@
                 "reference": "3.31.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -758,7 +758,7 @@
                 "reference": "1.16.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -776,7 +776,7 @@
                 "reference": "7.8.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -794,7 +794,7 @@
                 "reference": "7.8.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -812,7 +812,7 @@
                 "reference": "7.8.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -830,7 +830,7 @@
                 "reference": "v3.8.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -848,7 +848,7 @@
                 "reference": "2.10.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -866,7 +866,7 @@
                 "reference": "3.10.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -884,7 +884,7 @@
                 "reference": "3.11.4"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -902,7 +902,7 @@
                 "reference": "v4.2.2"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -920,7 +920,7 @@
                 "reference": "v1.3.5"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -938,7 +938,7 @@
                 "reference": "v4.1.4"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -956,7 +956,7 @@
                 "reference": "v5.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -974,7 +974,7 @@
                 "reference": "v2.4.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -992,7 +992,7 @@
                 "reference": "v4.32.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1010,7 +1010,7 @@
                 "reference": "v3.1.3"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1028,7 +1028,7 @@
                 "reference": "1.9.5"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1046,7 +1046,7 @@
                 "reference": "v9.0.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1064,7 +1064,7 @@
                 "reference": "v4.0.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1082,7 +1082,7 @@
                 "reference": "1.0.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1100,7 +1100,7 @@
                 "reference": "2.0.2"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1118,7 +1118,7 @@
                 "reference": "1.0.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1136,7 +1136,7 @@
                 "reference": "1.0.3"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1154,7 +1154,7 @@
                 "reference": "1.1.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1172,7 +1172,7 @@
                 "reference": "2.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1190,7 +1190,7 @@
                 "reference": "3.0.2"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1208,7 +1208,7 @@
                 "reference": "3.0.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1226,7 +1226,7 @@
                 "reference": "v0.12.23"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1244,7 +1244,7 @@
                 "reference": "3.0.3"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1262,7 +1262,7 @@
                 "reference": "2.1.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1280,7 +1280,7 @@
                 "reference": "4.9.2"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1298,7 +1298,7 @@
                 "reference": "v5.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1316,7 +1316,7 @@
                 "reference": "v1.1.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1334,7 +1334,7 @@
                 "reference": "v9.18.1.10"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1352,7 +1352,7 @@
                 "reference": "2.1.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1370,7 +1370,7 @@
                 "reference": "1.93.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1388,7 +1388,7 @@
                 "reference": "2.4.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1406,7 +1406,7 @@
                 "reference": "1.0.5"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1424,7 +1424,7 @@
                 "reference": "v7.4.8"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1442,7 +1442,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1460,7 +1460,7 @@
                 "reference": "v7.4.9"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1478,7 +1478,7 @@
                 "reference": "v3.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1496,7 +1496,7 @@
                 "reference": "v7.4.8"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1514,7 +1514,7 @@
                 "reference": "v7.4.9"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1532,7 +1532,7 @@
                 "reference": "v3.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1550,7 +1550,7 @@
                 "reference": "v7.4.8"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1568,7 +1568,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1586,7 +1586,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1604,7 +1604,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1622,7 +1622,7 @@
                 "reference": "v7.4.12"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1640,7 +1640,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1658,7 +1658,7 @@
                 "reference": "v1.37.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1676,7 +1676,7 @@
                 "reference": "v1.38.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1694,7 +1694,7 @@
                 "reference": "v1.38.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1712,7 +1712,7 @@
                 "reference": "v1.38.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1730,7 +1730,7 @@
                 "reference": "v1.38.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1748,7 +1748,7 @@
                 "reference": "v1.37.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1766,7 +1766,7 @@
                 "reference": "v1.38.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1784,7 +1784,7 @@
                 "reference": "v1.38.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1802,7 +1802,7 @@
                 "reference": "v1.38.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1820,7 +1820,7 @@
                 "reference": "v1.37.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1838,7 +1838,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1856,7 +1856,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1874,7 +1874,7 @@
                 "reference": "v3.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1892,7 +1892,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1910,7 +1910,7 @@
                 "reference": "v7.4.10"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1928,7 +1928,7 @@
                 "reference": "v3.7.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1946,7 +1946,7 @@
                 "reference": "v7.4.9"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1964,7 +1964,7 @@
                 "reference": "v7.4.8"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -1982,7 +1982,7 @@
                 "reference": "v7.4.13"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -2000,7 +2000,7 @@
                 "reference": "v2.4.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -2018,7 +2018,7 @@
                 "reference": "2.1.0"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -2036,7 +2036,7 @@
                 "reference": "v5.6.3"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         },
         {
@@ -2054,7 +2054,7 @@
                 "reference": "2.1.1"
             },
             "type": "library",
-            "autoload": {},
+            "autoload": [],
             "notification_url": "https://packagist.org/downloads/"
         }
     ],
@@ -2352,13 +2352,13 @@
             "version": "3.0.2",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/cli-parser/zipball/3.0.2",
+                "url": "https://api.github.com/repos/sebastianbergmann/cli-parser/zipball/3.0.2",
                 "reference": "3.0.2",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/cli-parser.git",
+                "url": "https://github.com/sebastianbergmann/cli-parser.git",
                 "reference": "3.0.2"
             },
             "type": "library"
@@ -2368,13 +2368,13 @@
             "version": "3.0.3",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/code-unit/zipball/3.0.3",
+                "url": "https://api.github.com/repos/sebastianbergmann/code-unit/zipball/3.0.3",
                 "reference": "3.0.3",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/code-unit.git",
+                "url": "https://github.com/sebastianbergmann/code-unit.git",
                 "reference": "3.0.3"
             },
             "type": "library"
@@ -2384,13 +2384,13 @@
             "version": "6.3.3",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/comparator/zipball/6.3.3",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/6.3.3",
                 "reference": "6.3.3",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/comparator.git",
+                "url": "https://github.com/sebastianbergmann/comparator.git",
                 "reference": "6.3.3"
             },
             "type": "library"
@@ -2400,13 +2400,13 @@
             "version": "4.0.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/complexity/zipball/4.0.1",
+                "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/4.0.1",
                 "reference": "4.0.1",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/complexity.git",
+                "url": "https://github.com/sebastianbergmann/complexity.git",
                 "reference": "4.0.1"
             },
             "type": "library"
@@ -2416,13 +2416,13 @@
             "version": "6.0.2",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/diff/zipball/6.0.2",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/6.0.2",
                 "reference": "6.0.2",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/diff.git",
+                "url": "https://github.com/sebastianbergmann/diff.git",
                 "reference": "6.0.2"
             },
             "type": "library"
@@ -2432,13 +2432,13 @@
             "version": "7.2.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/environment/zipball/7.2.1",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/7.2.1",
                 "reference": "7.2.1",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/environment.git",
+                "url": "https://github.com/sebastianbergmann/environment.git",
                 "reference": "7.2.1"
             },
             "type": "library"
@@ -2448,13 +2448,13 @@
             "version": "6.3.2",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/exporter/zipball/6.3.2",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/6.3.2",
                 "reference": "6.3.2",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/exporter.git",
+                "url": "https://github.com/sebastianbergmann/exporter.git",
                 "reference": "6.3.2"
             },
             "type": "library"
@@ -2464,13 +2464,13 @@
             "version": "7.0.2",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/global-state/zipball/7.0.2",
+                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/7.0.2",
                 "reference": "7.0.2",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/global-state.git",
+                "url": "https://github.com/sebastianbergmann/global-state.git",
                 "reference": "7.0.2"
             },
             "type": "library"
@@ -2480,13 +2480,13 @@
             "version": "3.0.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/lines-of-code/zipball/3.0.1",
+                "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/3.0.1",
                 "reference": "3.0.1",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/lines-of-code.git",
+                "url": "https://github.com/sebastianbergmann/lines-of-code.git",
                 "reference": "3.0.1"
             },
             "type": "library"
@@ -2496,13 +2496,13 @@
             "version": "6.0.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/object-enumerator/zipball/6.0.1",
+                "url": "https://api.github.com/repos/sebastianbergmann/object-enumerator/zipball/6.0.1",
                 "reference": "6.0.1",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/object-enumerator.git",
+                "url": "https://github.com/sebastianbergmann/object-enumerator.git",
                 "reference": "6.0.1"
             },
             "type": "library"
@@ -2512,13 +2512,13 @@
             "version": "4.0.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/object-reflector/zipball/4.0.1",
+                "url": "https://api.github.com/repos/sebastianbergmann/object-reflector/zipball/4.0.1",
                 "reference": "4.0.1",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/object-reflector.git",
+                "url": "https://github.com/sebastianbergmann/object-reflector.git",
                 "reference": "4.0.1"
             },
             "type": "library"
@@ -2528,13 +2528,13 @@
             "version": "6.0.3",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/recursion-context/zipball/6.0.3",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/6.0.3",
                 "reference": "6.0.3",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/recursion-context.git",
+                "url": "https://github.com/sebastianbergmann/recursion-context.git",
                 "reference": "6.0.3"
             },
             "type": "library"
@@ -2544,13 +2544,13 @@
             "version": "5.1.3",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/type/zipball/5.1.3",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/5.1.3",
                 "reference": "5.1.3",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/type.git",
+                "url": "https://github.com/sebastianbergmann/type.git",
                 "reference": "5.1.3"
             },
             "type": "library"
@@ -2560,13 +2560,13 @@
             "version": "5.0.2",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastian/version/zipball/5.0.2",
+                "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/5.0.2",
                 "reference": "5.0.2",
                 "shasum": ""
             },
             "source": {
                 "type": "git",
-                "url": "https://github.com/sebastian/version.git",
+                "url": "https://github.com/sebastianbergmann/version.git",
                 "reference": "5.0.2"
             },
             "type": "library"
@@ -2590,12 +2590,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2 || ^8.3"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
