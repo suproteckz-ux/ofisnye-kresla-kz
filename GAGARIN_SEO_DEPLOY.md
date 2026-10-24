@@ -11,7 +11,7 @@ API создаёт только неопубликованные записи б
 Добавить в production `.env`:
 
 ```dotenv
-SEO_MANAGER_WRITE_TOKEN_SHA256=<скопируйте_из_DPAPI_AUTOHIMIKI_LARAVEL_API_TOKEN_sha256>
+SEO_MANAGER_WRITE_TOKEN_SHA256=<скопируйте_из_DPAPI_OFFICE_CHAIRS_LARAVEL_API_TOKEN_sha256>
 SEO_MANAGER_READ_TOKEN_SHA256=
 SEO_MANAGER_ALLOW_LOCAL_HTTP=false
 SEO_MANAGER_PUBLIC_URL=https://xn----8sbnbmoilhzgg4a5h.kz
