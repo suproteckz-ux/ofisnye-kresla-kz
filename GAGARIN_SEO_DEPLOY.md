@@ -22,16 +22,44 @@ SEO_MANAGER_PUBLIC_URL=https://xn----8sbnbmoilhzgg4a5h.kz
 ## Команды в Plesk Terminal
 
 ```bash
-git status --short
+set -euo pipefail
+# Убедиться, что мы в корне Laravel-проекта
+test -f artisan && test -f .env
+
+git status --porcelain --untracked-files=no
 git fetch origin
 git checkout main
 git pull --ff-only origin main
+
+/opt/alt/php83/usr/bin/php artisan down
+trap '/opt/alt/php83/usr/bin/php artisan up' EXIT
+
+/opt/alt/php83/usr/bin/php composer install --no-dev --prefer-dist \
+    --optimize-autoloader --no-interaction
+
+/opt/alt/php83/usr/bin/php artisan migrate:status
 /opt/alt/php83/usr/bin/php artisan migrate --force
 /opt/alt/php83/usr/bin/php artisan optimize:clear
 /opt/alt/php83/usr/bin/php artisan config:cache
-/opt/alt/php83/usr/bin/php artisan route:list --path=seo-manager
+/opt/alt/php83/usr/bin/php artisan route:list --path=api/seo-manager
+/opt/alt/php83/usr/bin/php artisan up
+trap - EXIT
+
+curl --fail --silent --show-error \
+    "https://xn----8sbnbmoilhzgg4a5h.kz/api/seo-manager/v1/status" \
+    -H "Authorization: Bearer <токен_из_DPAPI_OFFICE_CHAIRS_LARAVEL_API_TOKEN>"
 ```
 
-Ожидаются пять маршрутов: статус, каталог, создание черновика, обновление неопубликованного черновика и создание предложения улучшения.
+Если `git status` показывает изменения, если `migrate:status` выдаёт ошибку или любая команда завершилась с ненулевым кодом — остановитесь.
+
+Ожидаются пять маршрутов:
+
+```
+GET|HEAD  api/seo-manager/v1/status
+GET|HEAD  api/seo-manager/v1/catalog/{kind}
+POST      api/seo-manager/v1/drafts
+PUT       api/seo-manager/v1/drafts/{id}
+POST      api/seo-manager/v1/proposals
+```
 
 После ручного деплоя сначала проверить `GET /api/seo-manager/v1/status` с production-токеном из DPAPI. Только после успешного HTTPS-ответа переключить настройки проекта на production. Автоматические генерацию и передачу оставить выключенными до отдельного контрольного цикла. Публикация остаётся ручной в Filament.
